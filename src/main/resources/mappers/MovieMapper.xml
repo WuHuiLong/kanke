@@ -211,4 +211,39 @@
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
+  <select id="selectList" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM movie
+    ORDER BY id ,ASC
+  </select>
+
+  <select id="selectByNameAndMovieId" resultMap="BaseResultMap" parameterType="map">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM movie
+    <where>
+      <if test="movieName !=null">
+        AND name LIKE #{movieName}
+      </if>
+      <if test="movieId !=null">
+        And id =#{movieId}
+      </if>
+    </where>
+  </select>
+  
+  <select id="selectByNameAndCategoryId" resultMap="BaseResultMap" parameterType="map">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM movie
+    WHERE status=1
+    <if test="movieName !=null">
+      AND name LIKE #{movieName}
+    </if>
+    <if test="categoryIdList !=null">
+    And category_id in
+    <foreach item="item" index="index" open="(" separator="," close=")" collection="categoryIdList">
+      #{item}
+    </foreach>
+  </select>
 </mapper>
