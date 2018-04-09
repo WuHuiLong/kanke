@@ -120,7 +120,7 @@
   <select id="selectCategoryChildrenByParentId" resultMap="BaseResultMap" parameterType="int">
     SELECT
     <include refid="Base_Column_List"/>
-    FROM mmall_category
+    FROM category
     WHERE parent_id=#{parentId}
   </select>
 </mapper>

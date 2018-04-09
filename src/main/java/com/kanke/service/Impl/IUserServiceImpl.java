@@ -155,7 +155,7 @@ public class IUserServiceImpl implements IUserService{
         updateUser.setId(user.getId());
         updateUser.setAnswer(user.getAnswer());
         updateUser.setEmail(user.getEmail());
-        updateUser.setQueston(user.getQueston());
+        updateUser.setQuestion(user.getQuestion());
         updateUser.setTelephone(user.getTelephone());
         int updateCount=userMapper.updateByPrimaryKeySelective(updateUser);
         if(updateCount>0){
