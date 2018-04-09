@@ -245,5 +245,6 @@
     <foreach item="item" index="index" open="(" separator="," close=")" collection="categoryIdList">
       #{item}
     </foreach>
+    </if>
   </select>
 </mapper>
