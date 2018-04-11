@@ -20,7 +20,7 @@ public interface MovieMapper {
 
     List<Movie> selectList();
 
-    List<Movie> selectByNameAndMovieId(@Param("movieName") String movieName,@Param("movieId") Integer movieId);
+    List<Movie> selectByNameAndMovieId(@Param("movieName") String movieName, @Param("movieId") Integer movieId);
 
     List<Movie> selectByNameAndCategoryId(@Param("movieName") String movieName,@Param("categoryList") List<Integer> categoryList);
 }

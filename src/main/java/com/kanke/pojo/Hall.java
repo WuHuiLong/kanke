@@ -5,24 +5,24 @@ import java.util.Date;
 public class Hall {
     private Integer id;
 
-    private Integer movieId;
-
     private String name;
 
-    private Date time;
-
     private Integer status;
+
+    private Integer number;
+
+    private String stype;
 
     private Date createTime;
 
     private Date updateTime;
 
-    public Hall(Integer id, Integer movieId, String name, Date time, Integer status, Date createTime, Date updateTime) {
+    public Hall(Integer id, String name, Integer status, Integer number, String stype, Date createTime, Date updateTime) {
         this.id = id;
-        this.movieId = movieId;
         this.name = name;
-        this.time = time;
         this.status = status;
+        this.number = number;
+        this.stype = stype;
         this.createTime = createTime;
         this.updateTime = updateTime;
     }
@@ -39,14 +39,6 @@ public class Hall {
         this.id = id;
     }
 
-    public Integer getMovieId() {
-        return movieId;
-    }
-
-    public void setMovieId(Integer movieId) {
-        this.movieId = movieId;
-    }
-
     public String getName() {
         return name;
     }
@@ -55,20 +47,28 @@ public class Hall {
         this.name = name == null ? null : name.trim();
     }
 
-    public Date getTime() {
-        return time;
-    }
-
-    public void setTime(Date time) {
-        this.time = time;
-    }
-
     public Integer getStatus() {
         return status;
     }
 
     public void setStatus(Integer status) {
         this.status = status;
+    }
+
+    public Integer getNumber() {
+        return number;
+    }
+
+    public void setNumber(Integer number) {
+        this.number = number;
+    }
+
+    public String getStype() {
+        return stype;
+    }
+
+    public void setStype(String stype) {
+        this.stype = stype == null ? null : stype.trim();
     }
 
     public Date getCreateTime() {
