@@ -119,5 +119,4 @@ public class HallManageController {
         }
         return ServerResponse.createByErrorMsg("不是管理员登录,无权限操作");
     }
-
 }
