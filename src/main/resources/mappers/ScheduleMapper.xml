@@ -30,8 +30,8 @@
       start_time, end_time, create_time, 
       update_time)
     values (#{id,jdbcType=INTEGER}, #{movieId,jdbcType=INTEGER}, #{hallId,jdbcType=INTEGER}, 
-      #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP}, #{createTime,jdbcType=TIMESTAMP}, 
-      #{updateTime,jdbcType=TIMESTAMP})
+      #{startTime,jdbcType=TIMESTAMP}, #{endTime,jdbcType=TIMESTAMP},now(),
+      now())
   </insert>
   <insert id="insertSelective" parameterType="com.kanke.pojo.Schedule" >
     insert into schedule
@@ -75,10 +75,10 @@
         #{endTime,jdbcType=TIMESTAMP},
       </if>
       <if test="createTime != null" >
-        #{createTime,jdbcType=TIMESTAMP},
+        now(),
       </if>
       <if test="updateTime != null" >
-        #{updateTime,jdbcType=TIMESTAMP},
+        now(),
       </if>
     </trim>
   </insert>
@@ -101,7 +101,7 @@
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null" >
-        update_time = #{updateTime,jdbcType=TIMESTAMP},
+        update_time = now(),
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -113,7 +113,25 @@
       start_time = #{startTime,jdbcType=TIMESTAMP},
       end_time = #{endTime,jdbcType=TIMESTAMP},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time = #{updateTime,jdbcType=TIMESTAMP}
+      update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
+  
+  <select id="selectScheduleByMovieIdHallId" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM schedule
+    WHERE movie_id=#{movidId}
+    and hall_id=#{hallId}
+  </select>
+  <select id="checkConflict" resultType="int" parameterType="map">
+    SELECT count(1)
+    FROM schedule
+    WHERE (start_time BETWEEN #{startTime} and #{endTime})
+    or (end_time between #{startTime} and #{endTime})
+    or (#{startTime} between start_time and end_time)
+    or (#{endTime} between start_time and end_time)
+  </select>
+
+
 </mapper>

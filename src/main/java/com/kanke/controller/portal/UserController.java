@@ -138,6 +138,12 @@ public class UserController {
         return iUserService.resetPassword(oldPassword,newPassword,user);
     }
 
+    /**
+     * 更新用户信息
+     * @param session
+     * @param user
+     * @return
+     */
     @RequestMapping(value="update_information.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<User> update_information(HttpSession session,User user){

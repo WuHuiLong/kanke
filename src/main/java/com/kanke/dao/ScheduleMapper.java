@@ -1,6 +1,9 @@
 package com.kanke.dao;
 
 import com.kanke.pojo.Schedule;
+import org.apache.ibatis.annotations.Param;
+
+import java.util.Date;
 
 public interface ScheduleMapper {
     int deleteByPrimaryKey(Integer id);
@@ -14,4 +17,8 @@ public interface ScheduleMapper {
     int updateByPrimaryKeySelective(Schedule record);
 
     int updateByPrimaryKey(Schedule record);
+
+    Schedule selectScheduleByMovieIdHallId(@Param("movidId") Integer movidId,@Param("hallId") Integer hallId);
+
+    int checkConflict(@Param("startTime")Date startTime,@Param("endTime")Date endTime);
 }

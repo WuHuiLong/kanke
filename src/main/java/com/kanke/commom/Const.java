@@ -11,6 +11,8 @@ public class Const {
 
     public static final String USERNAME="username";
 
+    public static final Long   HALFTIME=30*60*1000L;//休息时间30分钟；
+
     public interface MovieListOrderBy{
         Set<String> PRICE_ASC_DESC= Sets.newHashSet("price_desc","price_asc");
     }
@@ -46,6 +48,28 @@ public class Const {
         private int code;
 
         HallStatusEnum(int code,String value){
+            this.code=code;
+            this.value=value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public int getCode() {
+            return code;
+        }
+    }
+    public enum SeatStatusEnum{
+        SELECTABLE(0,"可选"),
+        REVERSIBILITY(1,"已选，可取消"),
+        UN_SELECTABLE(2,"不可选");
+
+
+        private String value;
+        private int code;
+
+        SeatStatusEnum(int code,String value){
             this.code=code;
             this.value=value;
         }
