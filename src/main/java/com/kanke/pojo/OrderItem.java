@@ -1,6 +1,5 @@
 package com.kanke.pojo;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 public class OrderItem {
@@ -10,34 +9,19 @@ public class OrderItem {
 
     private Long orderNo;
 
-    private Integer mvoieId;
-
-    private String movieName;
-
-    private String movieImage;
-
-    private BigDecimal currentUnitPrice;
-
-    private Integer quantity;
-
-    private BigDecimal totalPrice;
-
     private Date createTime;
 
     private Date updateTime;
 
-    public OrderItem(Integer id, Integer userId, Long orderNo, Integer mvoieId, String movieName, String movieImage, BigDecimal currentUnitPrice, Integer quantity, BigDecimal totalPrice, Date createTime, Date updateTime) {
+    private Integer seatId;
+
+    public OrderItem(Integer id, Integer userId, Long orderNo, Date createTime, Date updateTime, Integer seatId) {
         this.id = id;
         this.userId = userId;
         this.orderNo = orderNo;
-        this.mvoieId = mvoieId;
-        this.movieName = movieName;
-        this.movieImage = movieImage;
-        this.currentUnitPrice = currentUnitPrice;
-        this.quantity = quantity;
-        this.totalPrice = totalPrice;
         this.createTime = createTime;
         this.updateTime = updateTime;
+        this.seatId = seatId;
     }
 
     public OrderItem() {
@@ -68,54 +52,6 @@ public class OrderItem {
         this.orderNo = orderNo;
     }
 
-    public Integer getMvoieId() {
-        return mvoieId;
-    }
-
-    public void setMvoieId(Integer mvoieId) {
-        this.mvoieId = mvoieId;
-    }
-
-    public String getMovieName() {
-        return movieName;
-    }
-
-    public void setMovieName(String movieName) {
-        this.movieName = movieName == null ? null : movieName.trim();
-    }
-
-    public String getMovieImage() {
-        return movieImage;
-    }
-
-    public void setMovieImage(String movieImage) {
-        this.movieImage = movieImage == null ? null : movieImage.trim();
-    }
-
-    public BigDecimal getCurrentUnitPrice() {
-        return currentUnitPrice;
-    }
-
-    public void setCurrentUnitPrice(BigDecimal currentUnitPrice) {
-        this.currentUnitPrice = currentUnitPrice;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public BigDecimal getTotalPrice() {
-        return totalPrice;
-    }
-
-    public void setTotalPrice(BigDecimal totalPrice) {
-        this.totalPrice = totalPrice;
-    }
-
     public Date getCreateTime() {
         return createTime;
     }
@@ -130,5 +66,13 @@ public class OrderItem {
 
     public void setUpdateTime(Date updateTime) {
         this.updateTime = updateTime;
+    }
+
+    public Integer getSeatId() {
+        return seatId;
+    }
+
+    public void setSeatId(Integer seatId) {
+        this.seatId = seatId;
     }
 }

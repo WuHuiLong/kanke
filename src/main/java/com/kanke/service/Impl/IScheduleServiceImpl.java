@@ -1,5 +1,8 @@
 package com.kanke.service.Impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
 import com.kanke.commom.Const;
 import com.kanke.commom.ResponseCode;
 import com.kanke.commom.ServerResponse;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 
 import javax.xml.ws.Response;
 import java.util.Date;
+import java.util.List;
 
 @Service("iScheduleService")
 public class IScheduleServiceImpl implements IScheduleService {
@@ -37,7 +41,7 @@ public class IScheduleServiceImpl implements IScheduleService {
 //            return ServerResponse.createByErrorMsg("暂时还未排片");
 //        }
 //        ScheduleVo scheduleVo=getScheduleVo(schedule);
-//        //查询时不需要管是否冲突（应该排好了，不需要你操心了）
+//        //查询时不需要管是否冲突（已经排好了，不需要你操心了）
 ////        ServerResponse conflictResponse=this.checkConflict(DateTimeUtil.strToDate(scheduleVo.getStartTime()),DateTimeUtil.strToDate(scheduleVo.getEndTime1()));
 ////        if(!conflictResponse.isSuccess()){
 ////            return conflictResponse;
@@ -139,13 +143,6 @@ public class IScheduleServiceImpl implements IScheduleService {
         }
     }
 
-
-
-
-
-
-
-
     private ScheduleVo getScheduleVo(Schedule schedule){
         ScheduleVo scheduleVo=new ScheduleVo();
         scheduleVo.setId(schedule.getId());
@@ -158,6 +155,7 @@ public class IScheduleServiceImpl implements IScheduleService {
         Movie movie=movieMapper.selectByPrimaryKey(schedule.getMovieId());
         scheduleVo.setMovieName(movie.getName());
         scheduleVo.setMovieLength(movie.getLength());
+        scheduleVo.setPrice(movie.getPrice());
 
         Hall hall=hallMapper.selectByPrimaryKey(schedule.getHallId());
         scheduleVo.setHallName(hall.getName());
@@ -165,4 +163,26 @@ public class IScheduleServiceImpl implements IScheduleService {
 
         return scheduleVo;
     }
+
+    //前台板块
+
+    public ServerResponse<PageInfo> getDetail(Integer movieId ,int pageNum,int pageSize){
+        if(movieId==null){
+            return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        }
+        PageHelper.startPage(pageNum,pageSize);
+        List<Schedule> scheduleList=scheduleMapper.selectByMovieId(movieId);
+        List<ScheduleVo> scheduleVoList= Lists.newArrayList();
+        for(Schedule scheduleItem : scheduleList){
+            ScheduleVo scheduleVo=getScheduleVo(scheduleItem);
+            scheduleVoList.add(scheduleVo);
+        }
+        PageInfo pageInfo=new PageInfo(scheduleList);
+        pageInfo.setList(scheduleVoList);
+        return ServerResponse.createBySuccess(pageInfo);
+    }
+
+
+
+
 }

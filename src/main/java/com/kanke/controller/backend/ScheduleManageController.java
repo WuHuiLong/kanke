@@ -10,6 +10,7 @@ import com.kanke.service.IHallService;
 import com.kanke.service.IMovieService;
 import com.kanke.service.IScheduleService;
 import com.kanke.service.IUserService;
+import com.kanke.vo.ScheduleVo;
 import net.sf.jsqlparser.schema.Server;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -96,7 +97,7 @@ public class ScheduleManageController {
      */
     @RequestMapping(value="addSchedule.do",method = RequestMethod.POST)
     @ResponseBody
-    public  ServerResponse addSchedule(HttpSession session,Schedule schedule){
+    public  ServerResponse<ScheduleVo> addSchedule(HttpSession session, Schedule schedule){
         User user=(User) session.getAttribute(Const.CURRENT_USER);
         if(user==null){
             return  ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());

@@ -1,5 +1,6 @@
 package com.kanke.service;
 
+import com.github.pagehelper.PageInfo;
 import com.kanke.commom.ServerResponse;
 import com.kanke.pojo.Schedule;
 import com.kanke.vo.ScheduleVo;
@@ -15,4 +16,6 @@ public interface IScheduleService {
     ServerResponse checkConflict(Date startTime, Date endTime);
 
     ServerResponse<ScheduleVo> addAndUpdateSchedule(Schedule schedule);
+
+    ServerResponse<PageInfo> getDetail(Integer movieId , int pageNum, int pageSize);
 }

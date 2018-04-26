@@ -1,5 +1,6 @@
 package com.kanke.vo;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class ScheduleVo {
@@ -14,6 +15,15 @@ public class ScheduleVo {
     private Integer movieLength;
     private String createTime;
     private String updateTime;
+    private BigDecimal price;
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
 
     public Integer getId() {
         return id;

@@ -6,8 +6,8 @@
       <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
       <arg column="order_no" javaType="java.lang.Long" jdbcType="BIGINT" />
       <arg column="user_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
-      <arg column="hall_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
-      <arg column="seat_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="schedule_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="quantity" javaType="java.lang.Integer" jdbcType="INTEGER" />
       <arg column="payment" javaType="java.math.BigDecimal" jdbcType="DECIMAL" />
       <arg column="payment_type" javaType="java.lang.Integer" jdbcType="INTEGER" />
       <arg column="status" javaType="java.lang.Integer" jdbcType="INTEGER" />
@@ -19,7 +19,7 @@
     </constructor>
   </resultMap>
   <sql id="Base_Column_List">
-    id, order_no, user_id, hall_id, seat_id, payment, payment_type, status, payment_time, 
+    id, order_no, user_id, schedule_id, quantity, payment, payment_type, status, payment_time, 
     end_time, close_time, create_time, update_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
@@ -34,12 +34,12 @@
   </delete>
   <insert id="insert" parameterType="com.kanke.pojo.Order">
     insert into order (id, order_no, user_id, 
-      hall_id, seat_id, payment, 
+      schedule_id, quantity, payment, 
       payment_type, status, payment_time, 
       end_time, close_time, create_time, 
       update_time)
     values (#{id,jdbcType=INTEGER}, #{orderNo,jdbcType=BIGINT}, #{userId,jdbcType=INTEGER}, 
-      #{hallId,jdbcType=INTEGER}, #{seatId,jdbcType=INTEGER}, #{payment,jdbcType=DECIMAL}, 
+      #{scheduleId,jdbcType=INTEGER}, #{quantity,jdbcType=INTEGER}, #{payment,jdbcType=DECIMAL}, 
       #{paymentType,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{paymentTime,jdbcType=TIMESTAMP}, 
       #{endTime,jdbcType=TIMESTAMP}, #{closeTime,jdbcType=TIMESTAMP}, now(),
       now())
@@ -56,11 +56,11 @@
       <if test="userId != null">
         user_id,
       </if>
-      <if test="hallId != null">
-        hall_id,
+      <if test="scheduleId != null">
+        schedule_id,
       </if>
-      <if test="seatId != null">
-        seat_id,
+      <if test="quantity != null">
+        quantity,
       </if>
       <if test="payment != null">
         payment,
@@ -97,11 +97,11 @@
       <if test="userId != null">
         #{userId,jdbcType=INTEGER},
       </if>
-      <if test="hallId != null">
-        #{hallId,jdbcType=INTEGER},
+      <if test="scheduleId != null">
+        #{scheduleId,jdbcType=INTEGER},
       </if>
-      <if test="seatId != null">
-        #{seatId,jdbcType=INTEGER},
+      <if test="quantity != null">
+        #{quantity,jdbcType=INTEGER},
       </if>
       <if test="payment != null">
         #{payment,jdbcType=DECIMAL},
@@ -138,11 +138,11 @@
       <if test="userId != null">
         user_id = #{userId,jdbcType=INTEGER},
       </if>
-      <if test="hallId != null">
-        hall_id = #{hallId,jdbcType=INTEGER},
+      <if test="scheduleId != null">
+        schedule_id = #{scheduleId,jdbcType=INTEGER},
       </if>
-      <if test="seatId != null">
-        seat_id = #{seatId,jdbcType=INTEGER},
+      <if test="quantity != null">
+        quantity = #{quantity,jdbcType=INTEGER},
       </if>
       <if test="payment != null">
         payment = #{payment,jdbcType=DECIMAL},
@@ -166,7 +166,7 @@
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
       <if test="updateTime != null">
-        update_time =now(),
+        update_time = now(),
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
@@ -175,8 +175,8 @@
     update order
     set order_no = #{orderNo,jdbcType=BIGINT},
       user_id = #{userId,jdbcType=INTEGER},
-      hall_id = #{hallId,jdbcType=INTEGER},
-      seat_id = #{seatId,jdbcType=INTEGER},
+      schedule_id = #{scheduleId,jdbcType=INTEGER},
+      quantity = #{quantity,jdbcType=INTEGER},
       payment = #{payment,jdbcType=DECIMAL},
       payment_type = #{paymentType,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
@@ -184,7 +184,28 @@
       end_time = #{endTime,jdbcType=TIMESTAMP},
       close_time = #{closeTime,jdbcType=TIMESTAMP},
       create_time = #{createTime,jdbcType=TIMESTAMP},
-      update_time =now()
+      update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectByUserIdAndOrderId" parameterType="map" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM order
+    WHERE  user_id=#{userId}
+    And order_no=#{orderNo}
+  </select>
+
+  <select id="selectByOrderNo" parameterType="long" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM order
+    WHERE order_no=#{orderNo}
+  </select>
+
+  <select id="selectTotalPrice" parameterType="int" resultType="int">
+    SELECT NULLIF(sum(quantity),0)
+    FROM order
+    WHERE user_id=#{userId}
+  </select>
 </mapper>
