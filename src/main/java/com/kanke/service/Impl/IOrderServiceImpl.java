@@ -10,6 +10,7 @@ import com.alipay.demo.trade.model.result.AlipayF2FPrecreateResult;
 import com.alipay.demo.trade.service.AlipayTradeService;
 import com.alipay.demo.trade.service.impl.AlipayTradeServiceImpl;
 import com.alipay.demo.trade.utils.ZxingUtils;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.kanke.commom.Const;
 import com.kanke.commom.ResponseCode;
@@ -105,12 +106,61 @@ public class IOrderServiceImpl implements IOrderService {
 
         return null;
     }
+
+    /**
+     * 获取生成订单时座位数量
+     * @param hallId
+     * @param quantity
+     * @return
+     */
+    private ServerResponse<Integer> getQuantity(Integer hallId,Integer quantity){
+        List<Seat> seat=seatMapper.selectList(hallId);
+        if(seat==null){
+            return ServerResponse.createByErrorMsg("没有座位了，换个影厅试试吧");
+        }
+//        List<Seat> seatList= Lists.newArrayList();
+        for(Seat seatItem : seat){
+           if(seatItem.getStatus()==Const.SeatStatusEnum.REVERSIBILITY.getCode()){
+               quantity=quantity+1;
+//               seatList.add(seatItem);
+           }
+        }
+        return ServerResponse.createBySuccess(quantity);
+    }
+
+    /**
+     * 获取订单生成时的座位
+     * @param hallId
+     * @return
+     */
+    private ServerResponse<List<Seat>> getSeatList(Integer hallId){
+        List<Seat> seat=seatMapper.selectList(hallId);
+        if(seat==null){
+            return ServerResponse.createByErrorMsg("没有座位了，换个影厅试试吧");
+        }
+        List<Seat> seatList= Lists.newArrayList();
+        for(Seat seatItem : seat){
+            if(seatItem.getStatus()==Const.SeatStatusEnum.REVERSIBILITY.getCode()){
+//                quantity=quantity+1;
+                seatList.add(seatItem);
+            }
+        }
+        return ServerResponse.createBySuccess(seatList);
+    }
+
+    /**
+     * 获取订单生成时的总价格
+     * @param userId
+     * @return
+     */
     private ServerResponse<Integer> getTotalPrice(Integer userId){
         if(userId==null){
             return ServerResponse.createBySuccess(0);
         }
         return ServerResponse.createBySuccess(orderMapper.selectTotalPrice(userId));
     }
+
+
 
     private Order assembleOrder(Integer userId, Integer scheduleId, BigDecimal payment,Integer quantity){
         Order order=new Order();
