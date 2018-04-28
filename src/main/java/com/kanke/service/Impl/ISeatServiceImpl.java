@@ -72,6 +72,9 @@ public class ISeatServiceImpl implements ISeatService {
     public ServerResponse updateSeatStatus(Integer seatId,Integer status){//改变座位状态
         Seat seat = new Seat();
         seat.setId(seatId);
+        if(status == Const.SeatStatusEnum.UN_SELECTABLE.getCode()){
+            return ServerResponse.createByError();
+        }
         seat.setStatus(status);
         int rowCount=seatMapper.updateByPrimaryKeySelective(seat);
         if(rowCount>0){
