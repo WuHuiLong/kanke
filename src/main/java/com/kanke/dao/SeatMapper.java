@@ -2,6 +2,8 @@ package com.kanke.dao;
 
 import com.kanke.pojo.Seat;
 
+import java.util.List;
+
 public interface SeatMapper {
     int deleteByPrimaryKey(Integer id);
 
@@ -15,5 +17,5 @@ public interface SeatMapper {
 
     int updateByPrimaryKey(Seat record);
 
-
+    List<Seat> selectList(Integer hallId);
 }
