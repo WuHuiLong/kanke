@@ -216,7 +216,7 @@
 
   <update id="updatePasswordByUsername" parameterType="map">
     update user
-    SET password = #{passwordNew},update_time = now()
+    SET password = #{newPassword},update_time = now()
     where username = #{username}
   </update>
 

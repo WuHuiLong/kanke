@@ -48,4 +48,18 @@ public class MovieController {
                                          @RequestParam(value = "orderBy",defaultValue = "")String orderBy){
         return iMovieService.list(keyword,categoryId,pageNum,pageSize,orderBy);
     }
+
+    /**
+     * 前端全查询
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @RequestMapping(value="selectAll.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse<PageInfo> selectAll(@RequestParam(value = "pageNum",defaultValue = "1")int pageNum,
+                                              @RequestParam(value = "pageSize",defaultValue = "10")int pageSize){
+        return iMovieService.AllSelect(pageNum,pageSize);
+    }
+
 }

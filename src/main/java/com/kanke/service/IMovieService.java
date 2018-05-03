@@ -19,4 +19,6 @@ public interface IMovieService {
     ServerResponse<MovieDetailVo> detail(Integer movieId);
 
     ServerResponse<PageInfo> list(String keyword,Integer categoryId,int pageNum,int pageSize,String orderBy);
+
+    ServerResponse<PageInfo> AllSelect(int pageNum , int pageSize);
 }

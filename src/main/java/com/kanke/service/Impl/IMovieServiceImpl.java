@@ -223,4 +223,17 @@ public class IMovieServiceImpl implements IMovieService{
         return ServerResponse.createBySuccess(pageInfo);
     }
 
+    //前端全查询
+    public ServerResponse<PageInfo> AllSelect(int pageNum , int pageSize){
+        PageHelper.startPage(pageNum,pageSize);
+        List<Movie> movieList=movieMapper.selectList();
+        List<MovieListVo> movieListVoList=Lists.newArrayList();
+        for(Movie movieItem : movieList){
+            MovieListVo movieListVo=this.assembleMovieListVo(movieItem);
+            movieListVoList.add(movieListVo);
+        }
+        PageInfo pageInfo =new PageInfo(movieList);
+        pageInfo.setList(movieListVoList);
+        return ServerResponse.createBySuccess(pageInfo);
+    }
 }
