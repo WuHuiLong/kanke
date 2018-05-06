@@ -3,6 +3,8 @@ package com.kanke.dao;
 import com.kanke.pojo.Order;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 public interface OrderMapper {
     int deleteByPrimaryKey(Integer id);
 
@@ -21,5 +23,9 @@ public interface OrderMapper {
     Order selectByOrderNo(Long orderNo);
 
     int selectTotalPrice(Integer userId);
+
+    List<Order> selectByUserId(Integer userId);
+
+    List<Order> selectList();
 
 }

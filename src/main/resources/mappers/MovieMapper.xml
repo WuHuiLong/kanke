@@ -215,7 +215,7 @@
     SELECT
     <include refid="Base_Column_List" />
     FROM movie
-    ORDER BY id ,ASC
+    ORDER BY id ASC
   </select>
 
   <select id="selectByNameAndMovieId" parameterType="map" resultMap="BaseResultMap">
@@ -240,9 +240,9 @@
     <if test="movieName !=null">
       AND name LIKE #{movieName}
     </if>
-    <if test="categoryIdList !=null">
+    <if test="categoryList !=null">
     And category_id in
-    <foreach close=")" collection="categoryIdList" index="index" item="item" open="(" separator=",">
+    <foreach close=")" collection="categoryList" index="index" item="item" open="(" separator=",">
       #{item}
     </foreach>
     </if>

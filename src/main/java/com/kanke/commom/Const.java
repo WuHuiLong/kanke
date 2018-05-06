@@ -105,6 +105,15 @@ public class Const {
         public int getCode() {
             return code;
         }
+
+        public static OrderStatusEnum codeOf(int code){
+            for(OrderStatusEnum OrderStatusEnum1 : values()){
+                if(OrderStatusEnum1.getCode() == code){
+                    return OrderStatusEnum1;
+                }
+            }
+            throw new RuntimeException("没有这个枚举");
+        }
     }
     public interface AlipayCallback{
         String TRADE_STATUS_WAIT_BUYER_PAY="WAIT_BUYER_PAY";
@@ -151,6 +160,15 @@ public class Const {
 
         public int getCode() {
             return code;
+        }
+
+        public static paymentTypeEnum codeOf(int code){
+            for(paymentTypeEnum paymentTypeEnum1 : values()){
+                if(paymentTypeEnum1.getCode() == code){
+                    return paymentTypeEnum1;
+                }
+            }
+            throw new RuntimeException("没有这个枚举");
         }
     }
 }

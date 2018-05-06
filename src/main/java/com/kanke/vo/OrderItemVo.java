@@ -7,7 +7,7 @@ public class OrderItemVo {
 
     private Integer seatId;
 
-    private Date createTime;
+    private String createTime;
 
     public Long getOrderNo() {
         return orderNo;
@@ -25,11 +25,11 @@ public class OrderItemVo {
         this.seatId = seatId;
     }
 
-    public Date getCreateTime() {
+    public String getCreateTime() {
         return createTime;
     }
 
-    public void setCreateTime(Date createTime) {
+    public void setCreateTime(String createTime) {
         this.createTime = createTime;
     }
 }

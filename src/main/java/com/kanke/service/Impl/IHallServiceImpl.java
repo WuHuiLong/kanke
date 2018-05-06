@@ -2,15 +2,20 @@ package com.kanke.service.Impl;
 
 import com.kanke.commom.ServerResponse;
 import com.kanke.dao.HallMapper;
+import com.kanke.dao.SeatMapper;
 import com.kanke.pojo.Hall;
 import com.kanke.service.IHallService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
+
 @Service("iHallService")
 public class IHallServiceImpl implements IHallService {
     @Autowired
     private HallMapper hallMapper;
+    @Autowired
+    private SeatMapper seatMapper;
 
     public ServerResponse addHall(Hall hall){
         if(hall==null){

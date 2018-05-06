@@ -208,4 +208,19 @@
     FROM order
     WHERE user_id=#{userId}
   </select>
+
+  <select id="selectByUserId" resultMap="BaseResultMap" parameterType="list">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM order
+    WHERE user_id=#{userId}
+    order by creat_time desc
+  </select>
+
+  <select id="selectList" parameterType="list" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM order
+    ORDER BY create_time desc
+  </select>
 </mapper>

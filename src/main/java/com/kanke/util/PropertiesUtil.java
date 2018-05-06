@@ -17,7 +17,7 @@ public class PropertiesUtil {
         String filmName="mmall.properties";
         props=new Properties();
         try {
-            props.load(new InputStreamReader(Properties.class.getClassLoader().getResourceAsStream(filmName)));
+            props.load(new InputStreamReader(PropertiesUtil.class.getClassLoader().getResourceAsStream(filmName)));
         } catch (IOException e) {
             logger.error("配置文件异常",e);
         }

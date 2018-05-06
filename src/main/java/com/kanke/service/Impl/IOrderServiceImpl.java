@@ -10,6 +10,8 @@ import com.alipay.demo.trade.model.result.AlipayF2FPrecreateResult;
 import com.alipay.demo.trade.service.AlipayTradeService;
 import com.alipay.demo.trade.service.impl.AlipayTradeServiceImpl;
 import com.alipay.demo.trade.utils.ZxingUtils;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.kanke.commom.Const;
@@ -21,6 +23,10 @@ import com.kanke.service.IOrderService;
 import com.kanke.util.BigDecimalUtil;
 import com.kanke.util.DateTimeUtil;
 import com.kanke.util.PropertiesUtil;
+import com.kanke.vo.OrderItemVo;
+import com.kanke.vo.OrderVo;
+import com.kanke.vo.SeatVo;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,9 +83,12 @@ public class IOrderServiceImpl implements IOrderService {
     @Autowired
     private SeatMapper seatMapper;
 
-    public ServerResponse creat(Integer scheduleId,Integer seatId,Integer userId){
-        if(scheduleId==null&&userId==null&&seatId==null){
+    public ServerResponse creat(Integer scheduleId,List<Seat> seatList,Integer userId){
+        if(scheduleId==null&&userId==null){
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        }
+        if(CollectionUtils.isEmpty(seatList)){
+            return ServerResponse.createByErrorMsg("请先选择座位");
         }
         Schedule schedule=scheduleMapper.selectByPrimaryKey(scheduleId);
         if(schedule==null){
@@ -89,34 +98,117 @@ public class IOrderServiceImpl implements IOrderService {
         if(hall==null||hall.getStatus()!=Const.HallStatusEnum.IDLE.getCode()){
             return ServerResponse.createByErrorMsg("此放映厅没空，去他家把");
         }
-        Seat seat=seatMapper.selectByPrimaryKey(seatId);
-        if(seat==null){
-            return ServerResponse.createByErrorMsg("出错了呢，换个座位试试把");
-        }
-        if(seat.getStatus()==Const.SeatStatusEnum.UN_SELECTABLE.getCode()){
-            return ServerResponse.createByError();
-        }
-        if(seat.getStatus()==Const.SeatStatusEnum.SELECTABLE.getCode()){
-            //todo 选择座位 ，撤销座位等对座位的操作
-            return  null;
-        }
-
+//        Seat seat=seatMapper.selectByPrimaryKey(seatId);
+//        if(seat==null){
+//            return ServerResponse.createByErrorMsg("出错了呢，换个座位试试把");
+//        }
+//        if(seat.getStatus()==Const.SeatStatusEnum.UN_SELECTABLE.getCode()){
+//            return ServerResponse.createByError();
+//        }
+//        if(seat.getStatus()==Const.SeatStatusEnum.SELECTABLE.getCode()){
+//            //todo 选择座位 ，撤销座位等对座位的操作
+//            return  null;
+//        }
+        //开始时座位数为零
+        int quantity =this.getQuantity(hall.getId(),0);
         //计算总价格
+        Movie movie =movieMapper.selectByPrimaryKey(schedule.getMovieId());
+        BigDecimal payment= BigDecimalUtil.mul(quantity,movie.getPrice().doubleValue());
+        //生成订单
+        Order order =this.assembleOrder(userId,scheduleId,payment,quantity);
+        if(order==null){
+            return ServerResponse.createByErrorMsg("生成订单错误");
+        }
+        //生成订单详情
+        ServerResponse orderItemServer=this.assembleOrderItem(userId,seatList);
+        List<OrderItem> orderItemList=(List<OrderItem>) orderItemServer.getData();
+        for(OrderItem orderItem1 : orderItemList){
+            orderItem1.setOrderNo(order.getOrderNo());
+        }
+        //mybatis批量插入
+        orderItemMapper.batchInsert(orderItemList);
 
 
-        return null;
+//       校验剩余座位数目
+//        hall.setNumber(hall.getNumber()-quantity);
+//        if(hall.getNumber()==0){
+//            return ServerResponse.createByErrorMsg("票卖完了，换个影厅试试吧");
+//        }
+
+        //把买了之后的座位状态置为不可选
+        for(Seat seat : seatList){
+            seat.setStatus(Const.SeatStatusEnum.UN_SELECTABLE.getCode());
+            seatMapper.updateByPrimaryKeySelective(seat);
+        }
+
+        //返回信息给前端
+        OrderVo orderVo =assembleOrderVo(order,orderItemList);
+        return ServerResponse.createBySuccess(orderVo);
     }
 
+    //前端订单展示
+    private OrderVo assembleOrderVo(Order order,List<OrderItem> orderItemList){
+        OrderVo orderVo =new OrderVo();
+        orderVo.setOrderNo(order.getOrderNo());
+        orderVo.setCloseTime(DateTimeUtil.DateTostr(order.getCloseTime()));
+        orderVo.setCreateTime(DateTimeUtil.DateTostr(order.getCreateTime()));
+        orderVo.setEndTime(DateTimeUtil.DateTostr(order.getEndTime()));
+        orderVo.setUpdateTime(DateTimeUtil.DateTostr(order.getUpdateTime()));
+        orderVo.setPaymentTime(DateTimeUtil.DateTostr(order.getPaymentTime()));
+        orderVo.setPayment(order.getPayment());
+        orderVo.setScheduleId(order.getScheduleId());
+        orderVo.setQuantity(order.getQuantity());
+        orderVo.setStatus(order.getStatus());
+        orderVo.setStatusDesc(Const.OrderStatusEnum.codeOf(order.getStatus()).getValue());
+        orderVo.setPaymentType(order.getPaymentType());
+        orderVo.setPaymentTypeDesc(Const.paymentTypeEnum.codeOf(order.getPaymentType()).getValue());
+
+        Schedule schedule =scheduleMapper.selectByPrimaryKey(order.getScheduleId());
+
+        Movie movie = movieMapper.selectByPrimaryKey(schedule.getMovieId());
+        orderVo.setMovieId(movie.getId());
+        orderVo.setMovieName(movie.getName());
+
+        Hall hall = hallMapper.selectByPrimaryKey(schedule.getHallId());
+        orderVo.setHallId(hall.getId());
+        orderVo.setHallName(hall.getName());
+
+        List<OrderItemVo> orderItemVoList=Lists.newArrayList();
+        for(OrderItem orderItem : orderItemList){
+            OrderItemVo orderItemVo =assembleOrderItemVo(orderItem);
+            orderItemVoList.add(orderItemVo);
+        }
+        orderVo.setOrderItemVoList(orderItemVoList);
+        return orderVo;
+    }
+
+    //前端订单详情展示
+    private OrderItemVo assembleOrderItemVo(OrderItem orderItem){
+        OrderItemVo orderItemVo = new OrderItemVo();
+        orderItemVo.setSeatId(orderItem.getSeatId());
+
+        orderItemVo.setOrderNo(orderItem.getOrderNo());
+        orderItemVo.setCreateTime(DateTimeUtil.DateTostr(orderItem.getCreateTime()));
+        return orderItemVo;
+    }
+
+    private SeatVo assembleSeatVo(Seat seat){
+        SeatVo seatVo =new SeatVo();
+        seatVo.setColumn(seat.getColumn());
+        seatVo.setRow(seat.getRow());
+        seatVo.setStatus(seat.getStatus());
+        return seatVo;
+    }
     /**
      * 获取生成订单时座位数量
      * @param hallId
      * @param quantity
      * @return
      */
-    private ServerResponse<Integer> getQuantity(Integer hallId,Integer quantity){
+    private Integer getQuantity(Integer hallId,Integer quantity){
         List<Seat> seat=seatMapper.selectList(hallId);
         if(seat==null){
-            return ServerResponse.createByErrorMsg("没有座位了，换个影厅试试吧");
+            return null;
         }
 //        List<Seat> seatList= Lists.newArrayList();
         for(Seat seatItem : seat){
@@ -125,7 +217,7 @@ public class IOrderServiceImpl implements IOrderService {
 //               seatList.add(seatItem);
            }
         }
-        return ServerResponse.createBySuccess(quantity);
+        return quantity;
     }
 
     /**
@@ -160,8 +252,14 @@ public class IOrderServiceImpl implements IOrderService {
         return ServerResponse.createBySuccess(orderMapper.selectTotalPrice(userId));
     }
 
-
-
+    /**
+     * 生成订单
+     * @param userId
+     * @param scheduleId
+     * @param payment
+     * @param quantity
+     * @return
+     */
     private Order assembleOrder(Integer userId, Integer scheduleId, BigDecimal payment,Integer quantity){
         Order order=new Order();
         long orderNo=this.generateOrderNo();
@@ -184,8 +282,109 @@ public class IOrderServiceImpl implements IOrderService {
         return currentTime+new Random().nextInt(100);
     }
 
+    private ServerResponse assembleOrderItem(Integer userId,List<Seat> seatList){
+        List<OrderItem> orderItemList =Lists.newArrayList();
+        for(Seat seat : seatList){
+            OrderItem orderItem =new OrderItem();
+            if(seat.getStatus()!=Const.SeatStatusEnum.REVERSIBILITY.getCode()){
+                return ServerResponse.createByErrorMsg("还未选择或者不能选择此座位");
+            }
+            orderItem.setSeatId(seat.getId());
+            orderItem.setUserId(userId);
+            orderItemList.add(orderItem);
+        }
+        return ServerResponse.createBySuccess(orderItemList);
+    }
 
-    public ServerResponse pay(Long orderNo,Integer userId ,String path){
+
+    public ServerResponse<String> cancle(Integer userId,Long orderNo){
+        Order order =orderMapper.selectByUserIdAndOrderId(userId,orderNo);
+        if(order==null){
+            return ServerResponse.createByErrorMsg("此订单不存在");
+        }
+        if(order.getStatus()!=Const.OrderStatusEnum.NO_PAY.getCode()){
+            return ServerResponse.createByErrorMsg("已付款,无法取消订单");
+        }
+        Order order1 = new Order();
+        order1.setId(order.getId());
+        order1.setStatus(Const.OrderStatusEnum.CANCELED.getCode());
+        int rowCount = orderMapper.updateByPrimaryKey(order1);
+        if (rowCount>0) {
+            return ServerResponse.createBySuccessMsg("撤销成功");
+        }
+        return ServerResponse.createByErrorMsg("撤销失败");
+    }
+
+    public ServerResponse<OrderVo> getDetail (Long orderNo,Integer userId){
+        Order order =orderMapper.selectByUserIdAndOrderId(userId,orderNo);
+        if(order !=null){
+            List<OrderItem> orderItemList = orderItemMapper.getByOrderNoUserId(orderNo,userId);
+            OrderVo orderVo =assembleOrderVo(order,orderItemList);
+            return ServerResponse.createBySuccess(orderVo);
+        }
+        return ServerResponse.createByErrorMsg("未找到该订单");
+    }
+
+    public ServerResponse<PageInfo> getOrderList(Integer userId,int pageNum ,int pageSize){
+        PageHelper.startPage(pageNum,pageSize);
+        List<Order> orderList =orderMapper.selectByUserId(userId);
+        List<OrderVo> orderVoList =assembleListOrderVo(orderList,userId);
+        PageInfo pageInfo =new PageInfo(orderList);
+        pageInfo.setList(orderVoList);
+        return ServerResponse.createBySuccess(pageInfo);
+    }
+
+    private List<OrderVo> assembleListOrderVo(List<Order> orderList,Integer userId){
+        List<OrderVo> orderVoList =Lists.newArrayList();
+        for(Order order : orderList){
+            List<OrderItem> orderItemList=Lists.newArrayList();
+            if(userId ==null){
+                orderItemList =orderItemMapper.getByOrderNo(order.getOrderNo());
+            }
+            else{
+                orderItemList =orderItemMapper.getByOrderNoUserId(order.getOrderNo(),userId);
+            }
+            OrderVo orderVo =assembleOrderVo(order,orderItemList);
+            orderVoList.add(orderVo);
+        }
+        return orderVoList;
+    }
+
+    //后台
+    public ServerResponse<PageInfo> OrderListManage(int pageNum ,int pageSize){
+        PageHelper.startPage(pageNum,pageSize);
+        List<Order> orderList =orderMapper.selectList();
+        List<OrderVo> orderVoList =assembleListOrderVo(orderList,null);
+        PageInfo pageInfo =new PageInfo(orderList);
+        pageInfo.setList(orderVoList);
+        return ServerResponse.createBySuccess(pageInfo);
+    }
+
+    public ServerResponse<OrderVo> getDetailManage (Long orderNo){
+        Order order =orderMapper.selectByOrderNo(orderNo);
+        if(order !=null){
+            List<OrderItem> orderItemList = orderItemMapper.getByOrderNo(orderNo);
+            OrderVo orderVo =assembleOrderVo(order,orderItemList);
+            return ServerResponse.createBySuccess(orderVo);
+        }
+        return ServerResponse.createByErrorMsg("未找到该订单");
+    }
+
+    public ServerResponse<PageInfo> searchOrder(Long orderNo,int pageNum,int pageSize){
+        PageHelper.startPage(pageNum,pageSize);
+        Order order =orderMapper.selectByOrderNo(orderNo);
+        if(order==null){
+            return ServerResponse.createByErrorMsg("订单不存在");
+        }
+        List<OrderItem> orderItemList = orderItemMapper.getByOrderNo(orderNo);
+        OrderVo orderVo = assembleOrderVo(order,orderItemList);
+
+        PageInfo pageInfo = new PageInfo(Lists.newArrayList(order));
+        pageInfo.setList(Lists.newArrayList(orderVo));
+        return ServerResponse.createBySuccess(pageInfo);
+    }
+
+   public ServerResponse pay(Long orderNo,Integer userId ,String path){
         Map<String,String> resultMap = Maps.newHashMap();
         Order order=orderMapper.selectByUserIdAndOrderId(userId,orderNo);
         if(order==null){
@@ -243,13 +442,12 @@ public class IOrderServiceImpl implements IOrderService {
         if(movie==null){
             return ServerResponse.createByErrorMsg("电影未上映");
         }
-        List<OrderItem> orderItemList = orderItemMapper.getByOrderNoUserId(orderNo,userId);
-        for(OrderItem orderItem : orderItemList){
+
             GoodsDetail goods = GoodsDetail.newInstance(movie.getId().toString(), movie.getName(),
                     BigDecimalUtil.mul(movie.getPrice().doubleValue(),new Double(100).doubleValue()).longValue(),
                     order.getQuantity());
             goodsDetailList.add(goods);
-        }
+
 
         // 创建扫码支付请求builder，设置请求参数
         AlipayTradePrecreateRequestBuilder builder = new AlipayTradePrecreateRequestBuilder()
