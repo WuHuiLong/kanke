@@ -24,4 +24,6 @@ public interface ScheduleMapper {
     int checkConflict(@Param("startTime")Date startTime,@Param("endTime")Date endTime);
 
     List<Schedule> selectByMovieId(Integer movieId);
+
+    List<Schedule> selectList();
 }

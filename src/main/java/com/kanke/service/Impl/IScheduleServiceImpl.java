@@ -182,7 +182,31 @@ public class IScheduleServiceImpl implements IScheduleService {
         return ServerResponse.createBySuccess(pageInfo);
     }
 
+    //后台获取所有排片及分页
+    public ServerResponse<PageInfo> getDetailManege(int pageNum,int pageSize){
+        PageHelper.startPage(pageNum,pageSize);
+        List<Schedule> scheduleList=scheduleMapper.selectList();
+        List<ScheduleVo> scheduleVoList= Lists.newArrayList();
+        for(Schedule scheduleItem : scheduleList){
+            ScheduleVo scheduleVo=getScheduleVo(scheduleItem);
+            scheduleVoList.add(scheduleVo);
+        }
+        PageInfo pageInfo=new PageInfo(scheduleList);
+        pageInfo.setList(scheduleVoList);
+        return ServerResponse.createBySuccess(pageInfo);
+    }
 
-
+    //查询
+    public ServerResponse<ScheduleVo> getdetailById(Integer scheduleId){
+        if(scheduleId==null){
+            return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        }
+        Schedule schedule = scheduleMapper.selectByPrimaryKey(scheduleId);
+        ScheduleVo scheduleVo =getScheduleVo(schedule);
+        if(schedule==null){
+            return ServerResponse.createByErrorMsg("还没拍片呢，下次再来吧");
+        }
+        return ServerResponse.createBySuccess("排片完成",scheduleVo);
+    }
 
 }

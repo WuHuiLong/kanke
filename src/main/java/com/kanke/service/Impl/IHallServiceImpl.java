@@ -1,5 +1,7 @@
 package com.kanke.service.Impl;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.kanke.commom.ServerResponse;
 import com.kanke.dao.HallMapper;
 import com.kanke.dao.SeatMapper;
@@ -8,6 +10,7 @@ import com.kanke.service.IHallService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 
 
 @Service("iHallService")
@@ -76,4 +79,10 @@ public class IHallServiceImpl implements IHallService {
         return ServerResponse.createByErrorMsg("修改电影状态失败");
     }
 
+    public ServerResponse<PageInfo> hallList(int pageNum,int pageSize){
+        PageHelper.startPage(pageNum,pageSize);
+        List<Hall> hall =hallMapper.selectHallList();
+        PageInfo pageInfo = new PageInfo(hall);
+        return ServerResponse.createBySuccess(pageInfo);
+    }
 }

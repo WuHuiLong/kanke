@@ -36,6 +36,16 @@ public class OrderController {
     @Autowired
     private IOrderService iOrderService;
 
+
+    @RequestMapping(value="show.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse show(HttpSession session, Integer scheduleId,List<Seat> seatList){
+        User user =(User)session.getAttribute(Const.CURRENT_USER);
+        if(user==null){
+            return ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
+        }
+        return  iOrderService.show(scheduleId,user.getId(),seatList);
+    }
     /**
      * 创建订单和订单详情
      * @param session
@@ -86,7 +96,7 @@ public class OrderController {
     }
 
     /**
-     * 在用户资料中查看订单详情
+     * 用户查看订单详情
      * @param session
      * @param pageNum
      * @param pageSize

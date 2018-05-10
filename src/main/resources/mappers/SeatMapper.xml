@@ -123,4 +123,12 @@
     FROM seat
     WHERE hall_id=#{hallId}
   </select>
+  
+  <select id="selectSpecial" resultMap="BaseResultMap" parameterType="list">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM seat
+    WHERE hall_id=#{hallId}
+    and status = 1
+  </select>
 </mapper>

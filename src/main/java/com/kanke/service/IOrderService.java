@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface IOrderService {
+    ServerResponse show(Integer scheduleId,Integer userId,List<Seat> seatList);
 
     ServerResponse creat(Integer scheduleId, List<Seat> seatList, Integer userId);
 
@@ -29,4 +30,6 @@ public interface IOrderService {
     ServerResponse alipayCallback(Map<String,String> params);
 
     ServerResponse queryOrderPayStatus(Long orderNo,Integer userId);
+
+    Integer getQuantity(Integer hallId,Integer quantity);
 }

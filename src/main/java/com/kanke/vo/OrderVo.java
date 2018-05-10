@@ -32,9 +32,13 @@ public class OrderVo {
     private String updateTime;
 
     //后面是添加的
+    private Date startTime;
+
     private Integer movieId;
 
     private String movieName;
+
+    private BigDecimal price;
 
     private Integer hallId;
 
@@ -43,6 +47,22 @@ public class OrderVo {
     private List<Seat> seatList;
 
     private List<OrderItemVo> orderItemVoList;
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
 
     public Long getOrderNo() {
         return orderNo;

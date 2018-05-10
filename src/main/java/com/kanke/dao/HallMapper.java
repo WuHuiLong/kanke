@@ -2,6 +2,8 @@ package com.kanke.dao;
 
 import com.kanke.pojo.Hall;
 
+import java.util.List;
+
 public interface HallMapper {
     int deleteByPrimaryKey(Integer id);
 
@@ -14,4 +16,6 @@ public interface HallMapper {
     int updateByPrimaryKeySelective(Hall record);
 
     int updateByPrimaryKey(Hall record);
+
+    List<Hall> selectHallList();
 }

@@ -18,4 +18,6 @@ public interface SeatMapper {
     int updateByPrimaryKey(Seat record);
 
     List<Seat> selectList(Integer hallId);
+
+    List<Seat> selectSpecial(Integer hallId);
 }

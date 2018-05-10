@@ -1,6 +1,7 @@
 package com.kanke.dao;
 
 import com.kanke.pojo.OrderItem;
+import com.kanke.pojo.Seat;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -23,4 +24,6 @@ public interface OrderItemMapper {
     List<OrderItem> getByOrderNo(@Param("orderNo") Long orderNo);
 
     void batchInsert(@Param("orderItemList") List<OrderItem> orderItemList);
+
+    List<Seat> selectSeatList(Long orderNo);
 }

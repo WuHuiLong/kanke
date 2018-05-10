@@ -39,6 +39,12 @@ public class SeatController {
         return iSeatService.getSeatDetail(hallId);
     }
 
+    /**
+     * 选择单个座位
+     * @param session
+     * @param seatId
+     * @return
+     */
     @RequestMapping(value="selectSeat.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse selectSeat(HttpSession session,Integer seatId){
@@ -49,7 +55,13 @@ public class SeatController {
         return iSeatService.selectSeat(seatId);
     }
 
-
+    /**
+     * 更新单个座位状态
+     * @param session
+     * @param seatId
+     * @param status
+     * @return
+     */
     @RequestMapping(value="updateSeatStatus.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse updateSeatStatus(HttpSession session,Integer seatId,Integer status){
@@ -60,4 +72,19 @@ public class SeatController {
         return iSeatService.updateSeatStatus(seatId,status);
     }
 
+    /**
+     * 获取所有状态时已选的座位
+     * @param session
+     * @param hallId
+     * @return
+     */
+    @RequestMapping(value="getSeatSpecials.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse getSeatSpecials(HttpSession session,Integer hallId){
+        User user=(User)session.getAttribute(Const.CURRENT_USER);
+        if(user==null){
+            return ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
+        }
+        return iSeatService.getSeatSpecial(hallId);
+    }
 }

@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
@@ -108,6 +109,12 @@ public class ScheduleManageController {
         return ServerResponse.createByErrorMsg("不是管理员登录，无权限操作");
     }
 
+    /**
+     * 删除排片
+     * @param session
+     * @param scheduleId
+     * @return
+     */
     @RequestMapping(value="deleteSchedule.do",method = RequestMethod.POST)
     @ResponseBody
     public  ServerResponse deleteSchedule(HttpSession session,Integer scheduleId){
@@ -120,5 +127,28 @@ public class ScheduleManageController {
         }
         return ServerResponse.createByErrorMsg("不是管理员登录，无权限操作");
     }
+
+    /**
+     * 获取所有排片（已经排好的电影）
+     * @param session
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
+    @RequestMapping(value="AllSchedule.do",method = RequestMethod.POST)
+    @ResponseBody
+    public  ServerResponse AllSchedule(HttpSession session,
+                                       @RequestParam(value = "pageNum",defaultValue = "1")int pageNum,
+                                       @RequestParam(value = "pageSize",defaultValue = "10")int pageSize){
+        User user=(User) session.getAttribute(Const.CURRENT_USER);
+        if(user==null){
+            return  ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
+        }
+        if(iUserService.checkAdminRole(user).isSuccess()){
+            return  iScheduleService.getDetailManege(pageNum,pageSize);
+        }
+        return ServerResponse.createByErrorMsg("不是管理员登录，无权限操作");
+    }
+
 
 }

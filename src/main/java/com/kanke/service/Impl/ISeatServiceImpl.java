@@ -83,5 +83,13 @@ public class ISeatServiceImpl implements ISeatService {
         return  ServerResponse.createByErrorMsg("更改状态失败");
     }
 
+    //显示所有已经选择的座位
+    public ServerResponse<List<Seat>> getSeatSpecial(Integer hallId){
+        if(hallId!=null){
+            return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        }
+        List<Seat> seatList =seatMapper.selectSpecial(hallId);
+        return ServerResponse.createBySuccess(seatList);
+    }
 
 }

@@ -18,4 +18,8 @@ public interface IScheduleService {
     ServerResponse<ScheduleVo> addAndUpdateSchedule(Schedule schedule);
 
     ServerResponse<PageInfo> getDetail(Integer movieId , int pageNum, int pageSize);
+
+    ServerResponse<PageInfo> getDetailManege(int pageNum,int pageSize);
+
+    ServerResponse<ScheduleVo> getdetailById(Integer scheduleId);
 }

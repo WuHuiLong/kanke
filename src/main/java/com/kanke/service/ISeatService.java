@@ -11,4 +11,6 @@ public interface ISeatService {
     ServerResponse<Seat> selectSeat(Integer seatId);
 
     ServerResponse updateSeatStatus(Integer seatId,Integer status);
+
+    ServerResponse<List<Seat>> getSeatSpecial(Integer hallId);
 }

@@ -1,5 +1,6 @@
 package com.kanke.controller.backend;
 
+import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import com.kanke.commom.Const;
 import com.kanke.commom.ResponseCode;
@@ -106,7 +107,7 @@ public class MovieManageController {
      */
     @RequestMapping(value=" getList.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse getList(HttpSession session, @RequestParam(value = "pageNum",defaultValue = "1") int pageNum, @RequestParam(value = "pageSize",defaultValue = "10")int pageSize){
+    public ServerResponse<PageInfo> getList(HttpSession session, @RequestParam(value = "pageNum",defaultValue = "1") int pageNum, @RequestParam(value = "pageSize",defaultValue = "10")int pageSize){
         User user=(User) session.getAttribute(Const.CURRENT_USER);
         if (user==null){
             return ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),"用户未登录，请登录后再试");

@@ -25,6 +25,7 @@ import com.kanke.util.DateTimeUtil;
 import com.kanke.util.PropertiesUtil;
 import com.kanke.vo.OrderItemVo;
 import com.kanke.vo.OrderVo;
+import com.kanke.vo.ScheduleVo;
 import com.kanke.vo.SeatVo;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -83,8 +84,33 @@ public class IOrderServiceImpl implements IOrderService {
     @Autowired
     private SeatMapper seatMapper;
 
+    public ServerResponse show(Integer scheduleId,Integer userId,List<Seat> seatList){
+        if(scheduleId==null||userId==null){
+            return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        }
+        Schedule schedule = scheduleMapper.selectByPrimaryKey(scheduleId);
+        if(schedule==null){
+            return ServerResponse.createByErrorMsg("未排片，请换一个再试");
+        }
+        Movie movie =movieMapper.selectByPrimaryKey(schedule.getMovieId());
+        Hall hall =hallMapper.selectByPrimaryKey(schedule.getHallId());
+
+        //开始时座位数为零
+        int quantity =getQuantity(hall.getId(),0);
+        BigDecimal payment= BigDecimalUtil.mul(quantity,movie.getPrice().doubleValue());
+        OrderVo orderVo=new OrderVo();
+        orderVo.setMovieName(movie.getName());
+        orderVo.setHallName(hall.getName());
+        orderVo.setStartTime(schedule.getStartTime());
+        orderVo.setPrice(schedule.getPrice());
+        orderVo.setPayment(payment);
+        orderVo.setQuantity(quantity);
+        orderVo.setSeatList(seatList);
+        return ServerResponse.createBySuccess(orderVo);
+    }
+
     public ServerResponse creat(Integer scheduleId,List<Seat> seatList,Integer userId){
-        if(scheduleId==null&&userId==null){
+        if(scheduleId==null||userId==null){
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
         if(CollectionUtils.isEmpty(seatList)){
@@ -110,7 +136,7 @@ public class IOrderServiceImpl implements IOrderService {
 //            return  null;
 //        }
         //开始时座位数为零
-        int quantity =this.getQuantity(hall.getId(),0);
+        int quantity =getQuantity(hall.getId(),0);
         //计算总价格
         Movie movie =movieMapper.selectByPrimaryKey(schedule.getMovieId());
         BigDecimal payment= BigDecimalUtil.mul(quantity,movie.getPrice().doubleValue());
@@ -142,12 +168,12 @@ public class IOrderServiceImpl implements IOrderService {
         }
 
         //返回信息给前端
-        OrderVo orderVo =assembleOrderVo(order,orderItemList);
+        OrderVo orderVo =assembleOrderVo(order,orderItemList,seatList);
         return ServerResponse.createBySuccess(orderVo);
     }
 
     //前端订单展示
-    private OrderVo assembleOrderVo(Order order,List<OrderItem> orderItemList){
+    private OrderVo assembleOrderVo(Order order,List<OrderItem> orderItemList,List<Seat> seatList){
         OrderVo orderVo =new OrderVo();
         orderVo.setOrderNo(order.getOrderNo());
         orderVo.setCloseTime(DateTimeUtil.DateTostr(order.getCloseTime()));
@@ -164,14 +190,17 @@ public class IOrderServiceImpl implements IOrderService {
         orderVo.setPaymentTypeDesc(Const.paymentTypeEnum.codeOf(order.getPaymentType()).getValue());
 
         Schedule schedule =scheduleMapper.selectByPrimaryKey(order.getScheduleId());
+        orderVo.setStartTime(schedule.getStartTime());
 
         Movie movie = movieMapper.selectByPrimaryKey(schedule.getMovieId());
         orderVo.setMovieId(movie.getId());
         orderVo.setMovieName(movie.getName());
+        orderVo.setPrice(movie.getPrice());
 
         Hall hall = hallMapper.selectByPrimaryKey(schedule.getHallId());
         orderVo.setHallId(hall.getId());
         orderVo.setHallName(hall.getName());
+
 
         List<OrderItemVo> orderItemVoList=Lists.newArrayList();
         for(OrderItem orderItem : orderItemList){
@@ -179,6 +208,8 @@ public class IOrderServiceImpl implements IOrderService {
             orderItemVoList.add(orderItemVo);
         }
         orderVo.setOrderItemVoList(orderItemVoList);
+
+        orderVo.setSeatList(seatList);
         return orderVo;
     }
 
@@ -205,9 +236,9 @@ public class IOrderServiceImpl implements IOrderService {
      * @param quantity
      * @return
      */
-    private Integer getQuantity(Integer hallId,Integer quantity){
+    public Integer getQuantity(Integer hallId,Integer quantity){
         List<Seat> seat=seatMapper.selectList(hallId);
-        if(seat==null){
+        if(CollectionUtils.isEmpty(seat)){
             return null;
         }
 //        List<Seat> seatList= Lists.newArrayList();
@@ -225,10 +256,10 @@ public class IOrderServiceImpl implements IOrderService {
      * @param hallId
      * @return
      */
-    private ServerResponse<List<Seat>> getSeatList(Integer hallId){
+    private List<Seat> getSeatList(Integer hallId){
         List<Seat> seat=seatMapper.selectList(hallId);
-        if(seat==null){
-            return ServerResponse.createByErrorMsg("没有座位了，换个影厅试试吧");
+        if(CollectionUtils.isEmpty(seat)){
+            return null;
         }
         List<Seat> seatList= Lists.newArrayList();
         for(Seat seatItem : seat){
@@ -237,7 +268,7 @@ public class IOrderServiceImpl implements IOrderService {
                 seatList.add(seatItem);
             }
         }
-        return ServerResponse.createBySuccess(seatList);
+        return seatList;
     }
 
     /**
@@ -319,7 +350,8 @@ public class IOrderServiceImpl implements IOrderService {
         Order order =orderMapper.selectByUserIdAndOrderId(userId,orderNo);
         if(order !=null){
             List<OrderItem> orderItemList = orderItemMapper.getByOrderNoUserId(orderNo,userId);
-            OrderVo orderVo =assembleOrderVo(order,orderItemList);
+            List<Seat> seatList =orderItemMapper.selectSeatList(orderNo);
+            OrderVo orderVo =assembleOrderVo(order,orderItemList,seatList);
             return ServerResponse.createBySuccess(orderVo);
         }
         return ServerResponse.createByErrorMsg("未找到该订单");
@@ -344,7 +376,8 @@ public class IOrderServiceImpl implements IOrderService {
             else{
                 orderItemList =orderItemMapper.getByOrderNoUserId(order.getOrderNo(),userId);
             }
-            OrderVo orderVo =assembleOrderVo(order,orderItemList);
+            List<Seat> seatList = orderItemMapper.selectSeatList(order.getOrderNo());
+            OrderVo orderVo =assembleOrderVo(order,orderItemList,seatList);
             orderVoList.add(orderVo);
         }
         return orderVoList;
@@ -364,7 +397,8 @@ public class IOrderServiceImpl implements IOrderService {
         Order order =orderMapper.selectByOrderNo(orderNo);
         if(order !=null){
             List<OrderItem> orderItemList = orderItemMapper.getByOrderNo(orderNo);
-            OrderVo orderVo =assembleOrderVo(order,orderItemList);
+            List<Seat> seatList =orderItemMapper.selectSeatList(orderNo);
+            OrderVo orderVo =assembleOrderVo(order,orderItemList,seatList);
             return ServerResponse.createBySuccess(orderVo);
         }
         return ServerResponse.createByErrorMsg("未找到该订单");
@@ -377,7 +411,8 @@ public class IOrderServiceImpl implements IOrderService {
             return ServerResponse.createByErrorMsg("订单不存在");
         }
         List<OrderItem> orderItemList = orderItemMapper.getByOrderNo(orderNo);
-        OrderVo orderVo = assembleOrderVo(order,orderItemList);
+        List<Seat> seatList =orderItemMapper.selectSeatList(orderNo);
+        OrderVo orderVo = assembleOrderVo(order,orderItemList,seatList);
 
         PageInfo pageInfo = new PageInfo(Lists.newArrayList(order));
         pageInfo.setList(Lists.newArrayList(orderVo));

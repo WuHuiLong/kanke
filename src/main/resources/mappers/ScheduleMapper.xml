@@ -151,5 +151,10 @@
     WHERE movie_id=#{movieId}
   </select>
 
+  <select id="selectList" parameterType="list" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM schedule
+  </select>
 
 </mapper>

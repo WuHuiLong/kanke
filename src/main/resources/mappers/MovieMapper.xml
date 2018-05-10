@@ -211,10 +211,18 @@
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
+  <select id="selectListManage" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM movie
+    ORDER BY id ASC
+  </select>
+
   <select id="selectList" resultMap="BaseResultMap">
     SELECT
     <include refid="Base_Column_List" />
     FROM movie
+    WHERE status=1
     ORDER BY id ASC
   </select>
 
