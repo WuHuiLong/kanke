@@ -1,11 +1,11 @@
 package com.kanke.controller.portal;
 
+
 import com.github.pagehelper.PageInfo;
 import com.kanke.commom.ServerResponse;
-import com.kanke.pojo.Movie;
-import com.kanke.service.IMovieService;
-import com.kanke.service.IUserService;
-import com.kanke.vo.MovieDetailVo;
+import com.kanke.pojo.Commodity;
+import com.kanke.service.ICommodityService;
+import com.kanke.vo.CommodityDetailVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,39 +14,36 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping("/movie/")
-public class MovieController {
+@RequestMapping("/commodity/")
+public class CommodityController {
+
     @Autowired
-    private IMovieService iMovieService;
+    private ICommodityService iCommodityService;
 
     /**
-     * 前台电影详情
-     * @param movieId
+     * 前台商品详情
+     * @param commodityId
      * @return
      */
     @RequestMapping(value="detail.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse<MovieDetailVo> detail(Integer movieId){
-        return iMovieService.detail(movieId);
+    public ServerResponse<CommodityDetailVo> detail(Integer commodityId){
+        return iCommodityService.detail(commodityId);
     }
 
     /**
-     * 前台电影搜索，分页，排序
+     * 前台模糊搜索
      * @param keyword
-     * @param categoryId
      * @param pageNum
      * @param pageSize
-     * @param orderBy
      * @return
      */
     @RequestMapping(value="list.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<PageInfo> list(@RequestParam(value = "keyword",required = false) String keyword,
-                                         @RequestParam(value = "categoryId",required = false)Integer categoryId,
                                          @RequestParam(value = "pageNum",defaultValue = "1")int pageNum,
-                                         @RequestParam(value = "pageSize",defaultValue = "10")int pageSize,
-                                         @RequestParam(value = "orderBy",defaultValue = "")String orderBy){
-        return iMovieService.list(keyword,categoryId,pageNum,pageSize,orderBy);
+                                         @RequestParam(value = "pageSize",defaultValue = "10")int pageSize){
+        return iCommodityService.searchList(keyword,pageNum,pageSize);
     }
 
     /**
@@ -58,7 +55,7 @@ public class MovieController {
     @RequestMapping(value="selectAll.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse<PageInfo> selectAll(@RequestParam(value = "pageNum",defaultValue = "1")int pageNum,
-                                              @RequestParam(value = "pageSize",defaultValue = "10")int pageSize){
-        return iMovieService.AllSelect(pageNum,pageSize);
+                                              @RequestParam(value = "pageSize",defaultValue = "10")int pageSize) {
+        return iCommodityService.AllSelect(pageNum, pageSize);
     }
 }

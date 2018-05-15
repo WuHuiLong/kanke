@@ -27,6 +27,7 @@ import com.kanke.vo.OrderItemVo;
 import com.kanke.vo.OrderVo;
 import com.kanke.vo.ScheduleVo;
 import com.kanke.vo.SeatVo;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -42,6 +43,7 @@ import java.util.Map;
 import java.util.Random;
 
 @Service("iOrderService")
+@Slf4j
 public class IOrderServiceImpl implements IOrderService {
 
 
@@ -60,7 +62,6 @@ public class IOrderServiceImpl implements IOrderService {
         tradeService = new AlipayTradeServiceImpl.ClientBuilder().build();
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(IOrderServiceImpl.class);
 
 
     @Autowired
@@ -84,6 +85,7 @@ public class IOrderServiceImpl implements IOrderService {
     @Autowired
     private SeatMapper seatMapper;
 
+
     public ServerResponse show(Integer scheduleId,Integer userId,List<Seat> seatList){
         if(scheduleId==null||userId==null){
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
@@ -101,7 +103,7 @@ public class IOrderServiceImpl implements IOrderService {
         OrderVo orderVo=new OrderVo();
         orderVo.setMovieName(movie.getName());
         orderVo.setHallName(hall.getName());
-        orderVo.setStartTime(schedule.getStartTime());
+        orderVo.setStartTime(DateTimeUtil.DateTostr(schedule.getStartTime()));
         orderVo.setPrice(schedule.getPrice());
         orderVo.setPayment(payment);
         orderVo.setQuantity(quantity);
@@ -190,7 +192,7 @@ public class IOrderServiceImpl implements IOrderService {
         orderVo.setPaymentTypeDesc(Const.paymentTypeEnum.codeOf(order.getPaymentType()).getValue());
 
         Schedule schedule =scheduleMapper.selectByPrimaryKey(order.getScheduleId());
-        orderVo.setStartTime(schedule.getStartTime());
+        orderVo.setStartTime(DateTimeUtil.DateTostr(schedule.getStartTime()));
 
         Movie movie = movieMapper.selectByPrimaryKey(schedule.getMovieId());
         orderVo.setMovieId(movie.getId());
@@ -496,7 +498,7 @@ public class IOrderServiceImpl implements IOrderService {
         AlipayF2FPrecreateResult result = tradeService.tradePrecreate(builder);
         switch (result.getTradeStatus()) {
             case SUCCESS:
-                logger.info("支付宝预下单成功: )");
+                log.info("支付宝预下单成功: )");
 
                 AlipayTradePrecreateResponse response = result.getResponse();
                 dumpResponse(response);
@@ -513,21 +515,21 @@ public class IOrderServiceImpl implements IOrderService {
                 ZxingUtils.getQRCodeImge(response.getQrCode(), 256, filePath);
                 File file=new File(filePath);
                 String url=file.getName();
-                logger.info("filePath:" + filePath);
+                log.info("filePath:" + filePath);
                 resultMap.put("url",url);
                 return ServerResponse.createBySuccess(resultMap);
 
 
             case FAILED:
-                logger.error("支付宝预下单失败!!!");
+                log.error("支付宝预下单失败!!!");
                 return ServerResponse.createByErrorMsg("系统异常，预下单状态未知!!!");
 
             case UNKNOWN:
-                logger.error("系统异常，预下单状态未知!!!");
+                log.error("系统异常，预下单状态未知!!!");
                 return ServerResponse.createByErrorMsg("系统异常，预下单状态未知!!!");
 
             default:
-                logger.error("不支持的交易状态，交易返回异常!!!");
+                log.error("不支持的交易状态，交易返回异常!!!");
                 return ServerResponse.createByErrorMsg("不支持的交易状态，交易返回异常!!!");
         }
     }
@@ -535,12 +537,12 @@ public class IOrderServiceImpl implements IOrderService {
     // 简单打印应答
     private void dumpResponse(AlipayResponse response) {
         if (response != null) {
-            logger.info(String.format("code:%s, msg:%s", response.getCode(), response.getMsg()));
+            log.info(String.format("code:%s, msg:%s", response.getCode(), response.getMsg()));
             if (StringUtils.isNotEmpty(response.getSubCode())) {
-                logger.info(String.format("subCode:%s, subMsg:%s", response.getSubCode(),
+                log.info(String.format("subCode:%s, subMsg:%s", response.getSubCode(),
                         response.getSubMsg()));
             }
-            logger.info("body:" + response.getBody());
+            log.info("body:" + response.getBody());
         }
     }
 

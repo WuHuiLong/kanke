@@ -1,14 +1,15 @@
 package com.kanke.controller.backend;
 
+
 import com.github.pagehelper.PageInfo;
 import com.google.common.collect.Maps;
 import com.kanke.commom.Const;
 import com.kanke.commom.ResponseCode;
 import com.kanke.commom.ServerResponse;
-import com.kanke.pojo.Movie;
+import com.kanke.pojo.Commodity;
 import com.kanke.pojo.User;
+import com.kanke.service.ICommodityService;
 import com.kanke.service.IFileService;
-import com.kanke.service.IMovieService;
 import com.kanke.service.IUserService;
 import com.kanke.util.PropertiesUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -23,83 +24,80 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.xml.ws.Response;
 import java.util.Map;
 
 @Controller
-@RequestMapping("/manage/movie/")
-public class MovieManageController {
-
+@RequestMapping("/manage/commodity")
+public class CommodityManageController {
     @Autowired
     private IUserService iUserService;
 
     @Autowired
-    private IMovieService iMovieService;
+    private ICommodityService iCommodityService;
 
     @Autowired
     private IFileService iFileService;
 
     /**
-     * 更新电影和添加电影
+     * 添加商品和更新商品
      * @param session
-     * @param movie
+     * @param commodity
      * @return
      */
     @RequestMapping(value="movieSave.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse movieSave(HttpSession session, Movie movie){
+    public ServerResponse commoditySaveAndAdd(HttpSession session, Commodity commodity){
         User user=(User) session.getAttribute(Const.CURRENT_USER);
         if(user==null){
             return  ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
         }
         if(iUserService.checkAdminRole(user).isSuccess()){
-            return  iMovieService.saveOrUpdateMovie(movie);
+            return  iCommodityService.saveOrUpdateMovie(commodity);
         }
         return ServerResponse.createByErrorMsg("不是管理员登录，无权限操作");
     }
 
     /**
-     * 电影的上映和下架
+     * 改变商品状态
      * @param session
-     * @param movieId
+     * @param commodityId
      * @param status
      * @return
      */
-
     @RequestMapping(value="setSaleStatus.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse setSaleStatus(HttpSession session, Integer movieId,Integer status){
+    public ServerResponse setSaleStatus(HttpSession session, Integer commodityId,Integer status){
         User user=(User) session.getAttribute(Const.CURRENT_USER);
         if(user==null){
             return  ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
         }
         if(iUserService.checkAdminRole(user).isSuccess()){
-            return  iMovieService.setSaleStatus(movieId,status);
+            return  iCommodityService.setSaleStatus(commodityId,status);
         }
         return ServerResponse.createByErrorMsg("不是管理员登录，无权限操作");
     }
 
     /**
-     * 获取电影详情
+     * 获取商品详情
      * @param session
-     * @param movieId
+     * @param commodityId
      * @return
      */
     @RequestMapping(value="getDetail.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse getDetail(HttpSession session,Integer movieId){
+    public ServerResponse getDetail(HttpSession session,Integer commodityId){
         User user=(User) session.getAttribute(Const.CURRENT_USER);
         if(user==null){
             return  ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
         }
         if(iUserService.checkAdminRole(user).isSuccess()){
-            return  iMovieService.manageMovieDetail(movieId) ;
+            return  iCommodityService.manageCommodityDetail(commodityId) ;
         }
         return ServerResponse.createByErrorMsg("不是管理员登录，无权限操作");
     }
 
     /**
-     * 获取电影详情列表并分页
+     * 获取商品列表并分页
      * @param session
      * @param pageNum
      * @param pageSize
@@ -113,30 +111,21 @@ public class MovieManageController {
             return ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),"用户未登录，请登录后再试");
         }
         if(iUserService.checkAdminRole(user).isSuccess()){
-            return iMovieService.getMovieList(pageNum,pageSize);
+            return iCommodityService.getCommodityList(pageNum,pageSize);
         }
         return ServerResponse.createByErrorMsg("不是管理员登录，无权限操作");
     }
 
-    /**
-     * 后台电影搜索
-     * @param session
-     * @param movieName
-     * @param movieId
-     * @param pageNum
-     * @param pageSize
-     * @return
-     */
-    @RequestMapping(value=" movieSearch.do",method = RequestMethod.POST)
+    @RequestMapping(value="commoditySearch.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse movieSearch(HttpSession session,String movieName,Integer movieId,@RequestParam(value = "pageNum",
+    public ServerResponse commoditySearch(HttpSession session,String commodityName,Integer commodityId,@RequestParam(value = "pageNum",
             defaultValue = "1") int pageNum, @RequestParam(value = "pageSize",defaultValue = "10")int pageSize){
         User user=(User) session.getAttribute(Const.CURRENT_USER);
         if (user==null){
             return ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),"用户未登录，请登录后再试");
         }
         if(iUserService.checkAdminRole(user).isSuccess()){
-            return iMovieService.searchMovie(movieName,movieId,pageNum,pageSize);
+            return iCommodityService.searchCommodity(commodityName,commodityId,pageNum,pageSize);
         }
         return ServerResponse.createByErrorMsg("不是管理员登录，无权限操作");
     }
@@ -160,11 +149,11 @@ public class MovieManageController {
             String targetFileName=iFileService.upload(file,path);
 //            String url= PropertiesUtil.getProperties("ftp.server.http.prefix")+targetFileName;
             Map fileMap= Maps.newHashMap();
-            fileMap.put("uri",targetFileName);
-            fileMap.put("url",path);
+            fileMap.put("uri ：",targetFileName);
+            fileMap.put("url ：",path);
             return ServerResponse.createBySuccess(targetFileName);
         }
-        return ServerResponse.createByErrorMsg("非管理员登录，无权限操作");
+        return ServerResponse.createByErrorMsg("不是管理员登录，无权限操作");
     }
 
     /**
@@ -183,7 +172,7 @@ public class MovieManageController {
         User user=(User) session.getAttribute(Const.CURRENT_USER);
         if (user==null){
             resultMap.put("success",false);
-            resultMap.put("msg","请登录管理员账号再次尝试");
+            resultMap.put("msg","请登录管理员账号");
             return resultMap;
         }
         if(iUserService.checkAdminRole(user).isSuccess()){
@@ -191,13 +180,13 @@ public class MovieManageController {
             String targetFileName=iFileService.upload(file,path);
             if(StringUtils.isBlank(targetFileName)){
                 resultMap.put("success",false);
-                resultMap.put("msg","上传失败哦");
+                resultMap.put("msg","上传失败");
                 return resultMap;
             }
             String url= PropertiesUtil.getProperties("ftp.server.http.prefix")+targetFileName;
             resultMap.put("success",true);
-            resultMap.put("msg","上传成功");
-            resultMap.put("file_path",path);//FTP上传
+            resultMap.put("msg","上传成功了");
+            resultMap.put("file_path",path);//ftp上传
             response.addHeader("Access-Control-Allow-Headers","X-File-Name");
             return resultMap;
         }

@@ -1,5 +1,6 @@
 package com.kanke.controller.portal;
 
+import com.google.gson.Gson;
 import com.kanke.commom.Const;
 import com.kanke.commom.ResponseCode;
 import com.kanke.commom.ServerResponse;
@@ -10,15 +11,17 @@ import com.kanke.service.ISeatService;
 import com.kanke.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
+import java.util.Map;
 
 @Controller
-@RequestMapping("/manage/seat")
+@RequestMapping("/seat/")
 public class SeatController {
     @Autowired
     private ISeatService iSeatService;
@@ -29,13 +32,14 @@ public class SeatController {
      * @param hallId
      * @return
      */
-    @RequestMapping(value="getSeatDetail.do",method = RequestMethod.POST)
+    @RequestMapping(value="getSeatDetail.do",method = RequestMethod.POST, produces="application/json;charset=utf-8;")
     @ResponseBody
     public ServerResponse<List<Seat>> getSeatDetail(HttpSession session,Integer hallId){
         User user=(User)session.getAttribute(Const.CURRENT_USER);
         if(user==null){
             return ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
         }
+//        Integer hallId=Integer.parseInt(map.get("hall_id"));
         return iSeatService.getSeatDetail(hallId);
     }
 
@@ -73,7 +77,7 @@ public class SeatController {
     }
 
     /**
-     * 获取所有状态时已选的座位
+     * 获取所有状态是已选的座位
      * @param session
      * @param hallId
      * @return

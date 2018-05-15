@@ -13,7 +13,7 @@
     </constructor>
   </resultMap>
   <sql id="Base_Column_List">
-    id, hall_id, column, row, status, create_time, update_time
+    id, hall_id, `column`, row, status, create_time, update_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -43,7 +43,7 @@
         hall_id,
       </if>
       <if test="column != null">
-        column,
+        `column`,
       </if>
       <if test="row != null">
         row,
@@ -89,7 +89,7 @@
         hall_id = #{hallId,jdbcType=INTEGER},
       </if>
       <if test="column != null">
-        column = #{column,jdbcType=INTEGER},
+        `column` = #{column,jdbcType=INTEGER},
       </if>
       <if test="row != null">
         row = #{row,jdbcType=INTEGER},
@@ -119,14 +119,14 @@
   
   <select id="selectList" resultMap="BaseResultMap">
     SELECT
-    <include refid="Base_Column_List"/>
+    <include refid="Base_Column_List" />
     FROM seat
     WHERE hall_id=#{hallId}
   </select>
   
-  <select id="selectSpecial" resultMap="BaseResultMap" parameterType="list">
+  <select id="selectSpecial" resultMap="BaseResultMap">
     SELECT
-    <include refid="Base_Column_List"/>
+    <include refid="Base_Column_List" />
     FROM seat
     WHERE hall_id=#{hallId}
     and status = 1

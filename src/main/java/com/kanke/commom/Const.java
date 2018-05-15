@@ -21,6 +21,15 @@ public class Const {
         int ROLE_ADMIN=1;//管理员
     }
 
+
+    public interface Cart{
+        int CHECKED = 1;//即购物车选中状态
+        int UN_CHECKED = 0;//购物车中未选中状态
+
+        String LIMIT_NUM_FAIL = "LIMIT_NUM_FAIL";
+        String LIMIT_NUM_SUCCESS = "LIMIT_NUM_SUCCESS";
+    }
+
     public enum MovieStatusEnum{
         ON_SALE(1,"在线");
 
@@ -28,6 +37,26 @@ public class Const {
         private int code;
 
         MovieStatusEnum(int code,String value){
+            this.code=code;
+            this.value=value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public int getCode() {
+            return code;
+        }
+    }
+
+    public enum CommodityStatusEnum{
+        ON_SALE(1,"在线");
+
+        private String value;
+        private int code;
+
+        CommodityStatusEnum(int code,String value){
             this.code=code;
             this.value=value;
         }
@@ -115,6 +144,39 @@ public class Const {
             throw new RuntimeException("没有这个枚举");
         }
     }
+
+    public enum CommodityOrderStatusEnum{
+        CANCELED(0,"已取消"),
+        NO_PAY(10,"未支付"),
+        PAID(20,"已支付"),
+        ORDER_SUCCESS(40,"订单完成"),
+        ORDER_CLOSE(50,"订单关闭");
+
+        private String value;
+        private int code;
+
+        CommodityOrderStatusEnum(int code,String value){
+            this.code=code;
+            this.value=value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public static CommodityOrderStatusEnum codeOf(int code){
+            for(CommodityOrderStatusEnum OrderStatusEnum1 : values()){
+                if(OrderStatusEnum1.getCode() == code){
+                    return OrderStatusEnum1;
+                }
+            }
+            throw new RuntimeException("没有这个枚举");
+        }
+    }
     public interface AlipayCallback{
         String TRADE_STATUS_WAIT_BUYER_PAY="WAIT_BUYER_PAY";
         String TRADE_STATUS_TRADE_SUCCESS="TRADE_SUCCESS";
@@ -171,4 +233,8 @@ public class Const {
             throw new RuntimeException("没有这个枚举");
         }
     }
+
+
+
+
 }

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.kanke.dao.commodityMapper">
-  <resultMap id="BaseResultMap" type="com.kanke.pojo.commodity">
+<mapper namespace="com.kanke.dao.CommodityMapper">
+  <resultMap id="BaseResultMap" type="com.kanke.pojo.Commodity">
     <constructor>
       <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
       <arg column="name" javaType="java.lang.String" jdbcType="VARCHAR" />
@@ -28,7 +28,7 @@
     delete from commodity
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.kanke.pojo.commodity">
+  <insert id="insert" parameterType="com.kanke.pojo.Commodity">
     insert into commodity (id, name, main_image, 
       sub_images, detail, price, 
       stock, status, create_time, 
@@ -38,7 +38,7 @@
       #{stock,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, now(),
       now())
   </insert>
-  <insert id="insertSelective" parameterType="com.kanke.pojo.commodity">
+  <insert id="insertSelective" parameterType="com.kanke.pojo.Commodity">
     insert into commodity
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
@@ -105,7 +105,7 @@
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.kanke.pojo.commodity">
+  <update id="updateByPrimaryKeySelective" parameterType="com.kanke.pojo.Commodity">
     update commodity
     <set>
       <if test="name != null">
@@ -138,7 +138,7 @@
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.kanke.pojo.commodity">
+  <update id="updateByPrimaryKey" parameterType="com.kanke.pojo.Commodity">
     update commodity
     set name = #{name,jdbcType=VARCHAR},
       main_image = #{mainImage,jdbcType=VARCHAR},
@@ -151,4 +151,43 @@
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
+
+  <select id="selectListManage" parameterType="list" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM commodity
+    ORDER BY id ASC
+  </select>
+  
+  <select id="searchCommodityByNameAndId" parameterType="list" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM commodity
+    <where>
+      <if test="commodityName !=null">
+        AND name LIKE {commodityName}
+      </if>
+      <if test="commodityId !=null">
+        AND id LIKE {commodityId}
+      </if>
+    </where>
+  </select>
+  
+  <select id="searchCommodityByKeyword" parameterType="list" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM commodity
+    <where>
+      <if test="commodityName !=null">
+        AND name LIKE  {commodityName}
+      </if>
+    </where>
+  </select>
+
+  <select id="selectAll" parameterType="list" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List" />
+    FROM commodity
+    WHERE status=1;
+  </select>
 </mapper>

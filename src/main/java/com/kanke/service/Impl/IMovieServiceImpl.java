@@ -105,7 +105,7 @@ public class IMovieServiceImpl implements IMovieService{
         movieDetailVo.setCategoryId(movie.getCategoryId());
         movieDetailVo.setSub_image(movie.getSubImages());
         //这一处需要修改
-       movieDetailVo.setImageHost(PropertiesUtil.getProperties("ftp.server.http.prefix","http://image.imooc.com/"));
+        movieDetailVo.setImageHost(PropertiesUtil.getProperties("ftp.server.http.prefix","http://image.imooc.com/"));
         Category category=categoryMapper.selectByPrimaryKey(movie.getCategoryId());
         if(category==null){
             movieDetailVo.setParentCategoryId(0);

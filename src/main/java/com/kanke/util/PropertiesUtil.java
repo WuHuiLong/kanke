@@ -14,7 +14,7 @@ public class PropertiesUtil {
     private static Properties props;
 
     static{
-        String filmName="mmall.properties";
+        String filmName="kanke.properties";
         props=new Properties();
         try {
             props.load(new InputStreamReader(PropertiesUtil.class.getClassLoader().getResourceAsStream(filmName)));

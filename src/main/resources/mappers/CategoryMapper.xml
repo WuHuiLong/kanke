@@ -6,7 +6,7 @@
       <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
       <arg column="name" javaType="java.lang.String" jdbcType="VARCHAR" />
       <arg column="parent_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
-      <arg column="status" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="status" javaType="java.lang.Boolean" jdbcType="BOOLEAN" />
       <arg column="sort_order" javaType="java.lang.Integer" jdbcType="INTEGER" />
       <arg column="create_time" javaType="java.util.Date" jdbcType="TIMESTAMP" />
       <arg column="update_time" javaType="java.util.Date" jdbcType="TIMESTAMP" />
@@ -30,7 +30,7 @@
       status, sort_order, create_time, 
       update_time)
     values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{parentId,jdbcType=INTEGER}, 
-      #{status,jdbcType=INTEGER}, #{sortOrder,jdbcType=INTEGER}, now(),
+      #{status,jdbcType=BOOLEAN}, #{sortOrder,jdbcType=INTEGER}, now(),
       now())
   </insert>
   <insert id="insertSelective" parameterType="com.kanke.pojo.Category">
@@ -69,7 +69,7 @@
         #{parentId,jdbcType=INTEGER},
       </if>
       <if test="status != null">
-        #{status,jdbcType=INTEGER},
+        #{status,jdbcType=BOOLEAN},
       </if>
       <if test="sortOrder != null">
         #{sortOrder,jdbcType=INTEGER},
@@ -92,10 +92,10 @@
         parent_id = #{parentId,jdbcType=INTEGER},
       </if>
       <if test="status != null">
-        status = #{status,jdbcType=INTEGER},
+        status = #{status,jdbcType=BOOLEAN},
       </if>
       <if test="sortOrder != null">
-        sort_order = #{sortOrder,jdbcType=INTEGER},
+        sort_order = #{sortOrder,jdbcType=},
       </if>
       <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -110,7 +110,7 @@
     update category
     set name = #{name,jdbcType=VARCHAR},
       parent_id = #{parentId,jdbcType=INTEGER},
-      status = #{status,jdbcType=INTEGER},
+      status = #{status,jdbcType=BOOLEAN},
       sort_order = #{sortOrder,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
       update_time = now()

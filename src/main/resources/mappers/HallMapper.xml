@@ -119,7 +119,7 @@
 
   <select id="selectHallList" parameterType="list" resultMap="BaseResultMap">
     SELECT
-    <include refid="Base_Column_List"/>
+    <include refid="Base_Column_List" />
     FROM hall
   </select>
 </mapper>

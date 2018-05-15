@@ -114,9 +114,9 @@
     and user_id=#{userId}
   </select>
 
-  <select id="getByOrderNo" resultMap="BaseResultMap" parameterType="list">
+  <select id="getByOrderNo" parameterType="list" resultMap="BaseResultMap">
     SELECT
-    <include refid="Base_Column_List"/>
+    <include refid="Base_Column_List" />
     FROM order_item
     WHERE order_no =#{orderNo}
   </select>
@@ -136,7 +136,7 @@
 
   <select id="selectSeatList" parameterType="list" resultMap="BaseResultMap">
     SELECT
-    <include refid="Base_Column_List"/>
+    <include refid="Base_Column_List" />
     FROM order_item
     WHERE order_no=#{orderNo}
   </select>

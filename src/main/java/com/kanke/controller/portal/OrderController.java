@@ -36,7 +36,13 @@ public class OrderController {
     @Autowired
     private IOrderService iOrderService;
 
-
+    /**
+     * 下订单之前的展示
+     * @param session
+     * @param scheduleId
+     * @param seatList
+     * @return
+     */
     @RequestMapping(value="show.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse show(HttpSession session, Integer scheduleId,List<Seat> seatList){

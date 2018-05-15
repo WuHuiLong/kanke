@@ -1,17 +1,28 @@
 package com.kanke.dao;
 
-import com.kanke.pojo.commodity;
+import com.kanke.pojo.Commodity;
+import org.apache.ibatis.annotations.Param;
 
-public interface commodityMapper {
+import java.util.List;
+
+public interface CommodityMapper {
     int deleteByPrimaryKey(Integer id);
 
-    int insert(commodity record);
+    int insert(Commodity record);
 
-    int insertSelective(commodity record);
+    int insertSelective(Commodity record);
 
-    commodity selectByPrimaryKey(Integer id);
+    Commodity selectByPrimaryKey(Integer id);
 
-    int updateByPrimaryKeySelective(commodity record);
+    int updateByPrimaryKeySelective(Commodity record);
 
-    int updateByPrimaryKey(commodity record);
+    int updateByPrimaryKey(Commodity record);
+
+    List<Commodity> selectListManage();
+
+    List<Commodity> searchCommodityByNameAndId(@Param("commodityName") String commodityName,@Param("commodityId")Integer commodityId);
+
+    List<Commodity> searchCommodityByKeyword(@Param("commodityName")String commodityName);
+
+    List<Commodity> selectAll();
 }

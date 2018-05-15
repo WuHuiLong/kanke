@@ -146,14 +146,14 @@
 
   <select id="selectByMovieId" parameterType="int" resultMap="BaseResultMap">
     SELECT
-    <include refid="Base_Column_List"/>
+    <include refid="Base_Column_List" />
     FROM schedule
     WHERE movie_id=#{movieId}
   </select>
 
   <select id="selectList" parameterType="list" resultMap="BaseResultMap">
     SELECT
-    <include refid="Base_Column_List"/>
+    <include refid="Base_Column_List" />
     FROM schedule
   </select>
 

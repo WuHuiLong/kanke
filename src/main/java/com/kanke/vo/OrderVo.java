@@ -32,7 +32,7 @@ public class OrderVo {
     private String updateTime;
 
     //后面是添加的
-    private Date startTime;
+    private String startTime;
 
     private Integer movieId;
 
@@ -48,11 +48,11 @@ public class OrderVo {
 
     private List<OrderItemVo> orderItemVoList;
 
-    public Date getStartTime() {
+    public String getStartTime() {
         return startTime;
     }
 
-    public void setStartTime(Date startTime) {
+    public void setStartTime(String startTime) {
         this.startTime = startTime;
     }
 

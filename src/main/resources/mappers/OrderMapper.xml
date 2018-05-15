@@ -25,15 +25,15 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from order
+    from `order`
     where id = #{id,jdbcType=INTEGER}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
-    delete from order
+    delete from `order`
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.kanke.pojo.Order">
-    insert into order (id, order_no, user_id, 
+    insert into `order` (id, order_no, user_id,
       schedule_id, quantity, payment, 
       payment_type, status, payment_time, 
       end_time, close_time, create_time, 
@@ -45,7 +45,7 @@
       now())
   </insert>
   <insert id="insertSelective" parameterType="com.kanke.pojo.Order">
-    insert into order
+    insert into `order`
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         id,
@@ -130,7 +130,7 @@
     </trim>
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.kanke.pojo.Order">
-    update order
+    update `order`
     <set>
       <if test="orderNo != null">
         order_no = #{orderNo,jdbcType=BIGINT},
@@ -172,7 +172,7 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.kanke.pojo.Order">
-    update order
+    update `order`
     set order_no = #{orderNo,jdbcType=BIGINT},
       user_id = #{userId,jdbcType=INTEGER},
       schedule_id = #{scheduleId,jdbcType=INTEGER},
@@ -191,7 +191,7 @@
   <select id="selectByUserIdAndOrderId" parameterType="map" resultMap="BaseResultMap">
     SELECT
     <include refid="Base_Column_List" />
-    FROM order
+    FROM `order`
     WHERE  user_id=#{userId}
     And order_no=#{orderNo}
   </select>
@@ -199,28 +199,28 @@
   <select id="selectByOrderNo" parameterType="long" resultMap="BaseResultMap">
     SELECT
     <include refid="Base_Column_List" />
-    FROM order
+    FROM `order`
     WHERE order_no=#{orderNo}
   </select>
 
   <select id="selectTotalPrice" parameterType="int" resultType="int">
     SELECT NULLIF(sum(quantity),0)
-    FROM order
+    FROM `order`
     WHERE user_id=#{userId}
   </select>
 
-  <select id="selectByUserId" resultMap="BaseResultMap" parameterType="list">
+  <select id="selectByUserId" parameterType="list" resultMap="BaseResultMap">
     SELECT
-    <include refid="Base_Column_List"/>
-    FROM order
+    <include refid="Base_Column_List" />
+    FROM `order`
     WHERE user_id=#{userId}
     order by creat_time desc
   </select>
 
   <select id="selectList" parameterType="list" resultMap="BaseResultMap">
     SELECT
-    <include refid="Base_Column_List"/>
-    FROM order
+    <include refid="Base_Column_List" />
+    FROM `order`
     ORDER BY create_time desc
   </select>
 </mapper>

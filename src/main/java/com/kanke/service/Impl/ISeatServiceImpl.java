@@ -22,7 +22,7 @@ public class ISeatServiceImpl implements ISeatService {
     private HallMapper hallMapper;
 
     public ServerResponse<List<Seat>> getSeatDetail(Integer hallId){
-        if(hallId!=null){
+        if(hallId==null){
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
         Hall hall=hallMapper.selectByPrimaryKey(hallId);
@@ -70,12 +70,18 @@ public class ISeatServiceImpl implements ISeatService {
     }
 
     public ServerResponse updateSeatStatus(Integer seatId,Integer status){//改变座位状态
+        Seat seatitem =seatMapper.selectByPrimaryKey(seatId);
+        if(seatitem==null){
+            return ServerResponse.createByErrorMsg("没有这个座位哦");
+        }
         Seat seat = new Seat();
         seat.setId(seatId);
-        if(status == Const.SeatStatusEnum.UN_SELECTABLE.getCode()){
+        if(seatitem.getStatus() == Const.SeatStatusEnum.UN_SELECTABLE.getCode()){
             return ServerResponse.createByError();
         }
-        seat.setStatus(status);
+        else{
+            seat.setStatus(status);
+        }
         int rowCount=seatMapper.updateByPrimaryKeySelective(seat);
         if(rowCount>0){
             return ServerResponse.createBySuccessMsg("更改状态成功");
@@ -85,7 +91,7 @@ public class ISeatServiceImpl implements ISeatService {
 
     //显示所有已经选择的座位
     public ServerResponse<List<Seat>> getSeatSpecial(Integer hallId){
-        if(hallId!=null){
+        if(hallId==null){
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
         List<Seat> seatList =seatMapper.selectSpecial(hallId);

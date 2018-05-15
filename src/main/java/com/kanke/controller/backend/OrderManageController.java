@@ -40,7 +40,7 @@ public class OrderManageController {
     public ServerResponse<PageInfo> orderList(HttpSession session, @RequestParam(value = "pageNum",defaultValue = "1") int pageNum, @RequestParam(value = "pageSize",defaultValue = "10")int pageSize){
         User user =(User) session.getAttribute(Const.CURRENT_USER);
         if(user==null){
-            return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+            return ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
         }
         if(!iUserService.checkAdminRole(user).isSuccess()){
             return ServerResponse.createByErrorMsg("不是管理员登录，无权限操作");
@@ -59,7 +59,7 @@ public class OrderManageController {
     public ServerResponse<OrderVo> manageOrderDetail(HttpSession session, Long orderNo){
         User user =(User) session.getAttribute(Const.CURRENT_USER);
         if(user==null){
-            return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+            return ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
         }
         if(!iUserService.checkAdminRole(user).isSuccess()){
             return ServerResponse.createByErrorMsg("不是管理员登录，无权限操作");
@@ -78,7 +78,7 @@ public class OrderManageController {
     public ServerResponse<PageInfo> searchOrder(HttpSession session, Long orderNo, @RequestParam(value = "pageNum",defaultValue = "1") int pageNum, @RequestParam(value = "pageSize",defaultValue = "10")int pageSize){
         User user =(User) session.getAttribute(Const.CURRENT_USER);
         if(user==null){
-            return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+            return ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
         }
         if(!iUserService.checkAdminRole(user).isSuccess()){
             return ServerResponse.createByErrorMsg("不是管理员登录，无权限操作");

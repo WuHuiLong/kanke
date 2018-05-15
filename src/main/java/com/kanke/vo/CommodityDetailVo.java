@@ -1,4 +1,4 @@
-package com.kanke.pojo;
+package com.kanke.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import java.util.Date;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Commodity {
+public class CommodityDetailVo {
     private Integer id;
 
     private String name;
@@ -29,7 +29,10 @@ public class Commodity {
 
     private Integer status;
 
-    private Date createTime;
+    private String createTime;
 
-    private Date updateTime;
+    private String updateTime;
+
+    //后面添加的
+    private String imageHost;
 }
