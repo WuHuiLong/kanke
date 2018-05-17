@@ -21,4 +21,8 @@ public interface Commodity_order_itemMapper {
     List<Commodity_order_item> getByOrderNoUserId(@Param("userId") Integer userId,@Param("orderNo")Long orderNo);
 
     List<Commodity_order_item> getByOrderNo(Long orderNo);
+
+    void batchInsert(@Param("commodityOrderItems") List<Commodity_order_item> commodityOrderItems);
+
+
 }

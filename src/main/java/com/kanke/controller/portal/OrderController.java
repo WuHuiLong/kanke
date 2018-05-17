@@ -35,7 +35,6 @@ public class OrderController {
     private static final Logger logger= LoggerFactory.getLogger(OrderController.class);
     @Autowired
     private IOrderService iOrderService;
-
     /**
      * 下订单之前的展示
      * @param session
@@ -194,9 +193,9 @@ public class OrderController {
             return ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
         }
         ServerResponse serverResponse = iOrderService.queryOrderPayStatus(orderNo,user.getId());
-        if(serverResponse.isSuccess()){
-            return ServerResponse.createBySuccess(true);
+        if(!serverResponse.isSuccess()){
+            return ServerResponse.createBySuccess(false);
         }
-        return  ServerResponse.createBySuccess(false);
+        return  ServerResponse.createBySuccess(true);
     }
 }

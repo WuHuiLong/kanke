@@ -3,6 +3,8 @@ package com.kanke.dao;
 import com.kanke.pojo.Commodity_order;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 public interface Commodity_orderMapper {
     int deleteByPrimaryKey(Integer id);
 
@@ -19,4 +21,8 @@ public interface Commodity_orderMapper {
     Commodity_order selectByUserIdAndOrderNo(@Param("userId") Integer userId, @Param("orderNo")Long orderNo);
 
     Commodity_order selectByOrderNo(Long orderNo);
+
+    List<Commodity_order> selectByUserId(Integer userId);
+
+    List<Commodity_order> selectList();
 }

@@ -119,7 +119,6 @@ public class CartController {
      * 取消一个
      * @param session
      * @param commodityId
-     * @param checked
      * @return
      */
     @RequestMapping(value="UnSelectOne.do",method = RequestMethod.POST)

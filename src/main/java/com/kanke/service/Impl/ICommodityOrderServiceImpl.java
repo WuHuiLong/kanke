@@ -10,28 +10,32 @@ import com.alipay.demo.trade.model.result.AlipayF2FPrecreateResult;
 import com.alipay.demo.trade.service.AlipayTradeService;
 import com.alipay.demo.trade.service.impl.AlipayTradeServiceImpl;
 import com.alipay.demo.trade.utils.ZxingUtils;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.kanke.commom.Const;
 import com.kanke.commom.ServerResponse;
-import com.kanke.dao.CommodityMapper;
-import com.kanke.dao.Commodity_orderMapper;
-import com.kanke.dao.Commodity_order_itemMapper;
-import com.kanke.dao.PayInfoMapper;
-import com.kanke.pojo.Commodity_order;
-import com.kanke.pojo.Commodity_order_item;
-import com.kanke.pojo.PayInfo;
+import com.kanke.dao.*;
+import com.kanke.pojo.*;
 import com.kanke.service.ICommodityOrderService;
 import com.kanke.util.BigDecimalUtil;
 import com.kanke.util.DateTimeUtil;
+import com.kanke.util.PropertiesUtil;
+import com.kanke.vo.CommodityOrderItemVo;
+import com.kanke.vo.CommodityOrderVo;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 @Service("iCommodityOrderService")
 @Slf4j
@@ -48,6 +52,9 @@ public class ICommodityOrderServiceImpl implements ICommodityOrderService{
     @Autowired
     private PayInfoMapper payInfoMapper;
 
+    @Autowired
+    private CartMapper cartMapper;
+
     private static AlipayTradeService tradeService;
     static {
 
@@ -61,6 +68,263 @@ public class ICommodityOrderServiceImpl implements ICommodityOrderService{
          */
         tradeService = new AlipayTradeServiceImpl.ClientBuilder().build();
     }
+
+
+    public ServerResponse creat(Integer userId){
+        List<Cart> cartList =cartMapper.selectCart(userId);
+
+        ServerResponse serverResponse =this.getOrderItem(cartList,userId);
+        if(!serverResponse.isSuccess()){
+            return serverResponse;
+        }
+        List<Commodity_order_item> commodityOrderItems =(List<Commodity_order_item>)serverResponse.getData();
+        BigDecimal payment =this.getTolPrice(commodityOrderItems);
+
+        //生成订单
+        Commodity_order commodityOrder =this.assembleOrder(payment,userId);
+        if(commodityOrder==null){
+            return ServerResponse.createByErrorMsg("生成订单错误");
+        }
+        if(CollectionUtils.isEmpty(commodityOrderItems)){
+            return ServerResponse.createByErrorMsg("购物车为空");
+        }
+
+        for(Commodity_order_item commodityOrderItem : commodityOrderItems){
+            commodityOrderItem.setOrderNo(commodityOrder.getOrderNo());
+        }
+        //批量插入
+        commodity_order_itemMapper.batchInsert(commodityOrderItems);
+
+        //减少库存
+        this.reduceCommodityStock(commodityOrderItems);
+
+        //清空购物车
+        for(Cart cart : cartList){
+            cartMapper.deleteByPrimaryKey(cart.getId());
+        }
+
+        CommodityOrderVo commodityOrderVo =this.assembleOrderVo(commodityOrder,commodityOrderItems);
+        return ServerResponse.createBySuccess(commodityOrderVo);
+
+    }
+
+
+
+
+    private CommodityOrderVo assembleOrderVo(Commodity_order order, List<Commodity_order_item> commodityOrderItemList){
+        CommodityOrderVo orderVo = new CommodityOrderVo();
+        orderVo.setOrderNo(order.getOrderNo());
+        orderVo.setPayment(order.getPayment());
+        orderVo.setPaymentType(order.getPaymentType());
+        orderVo.setPaymentTypeDesc(Const.paymentTypeEnum.codeOf(order.getPaymentType()).getValue());
+
+        orderVo.setStatus(order.getStatus());
+        orderVo.setStatusDesc(Const.OrderStatusEnum.codeOf(order.getStatus()).getValue());
+
+
+        orderVo.setPaymentTime(DateTimeUtil.DateTostr(order.getPaymentTime()));
+        orderVo.setEndTime(DateTimeUtil.DateTostr(order.getEndTime()));
+        orderVo.setCreateTime(DateTimeUtil.DateTostr(order.getCreateTime()));
+        orderVo.setCloseTime(DateTimeUtil.DateTostr(order.getCloseTime()));
+
+
+        orderVo.setImageHost(PropertiesUtil.getProperties("ftp.server.http.prefix"));
+
+
+        List<CommodityOrderItemVo> orderItemVoList = Lists.newArrayList();
+
+        for(Commodity_order_item orderItem : commodityOrderItemList){
+            CommodityOrderItemVo orderItemVo = assembleOrderItemVo(orderItem);
+            orderItemVoList.add(orderItemVo);
+        }
+        orderVo.setCommodityOrderItemList(orderItemVoList);
+        return orderVo;
+    }
+
+    private CommodityOrderItemVo assembleOrderItemVo(Commodity_order_item commodity_order_item){
+        CommodityOrderItemVo commodityOrderItemVo =new CommodityOrderItemVo();
+        commodityOrderItemVo.setCommodityId(commodity_order_item.getCommodityId());
+        commodityOrderItemVo.setCommodityImage(commodity_order_item.getCommodityImage());
+        commodityOrderItemVo.setCommodityName(commodity_order_item.getCommodityName());
+        commodityOrderItemVo.setCurrentUnitPrice(commodity_order_item.getCurrentUnitPrice());
+        commodityOrderItemVo.setOrderNo(commodity_order_item.getOrderNo());
+        commodityOrderItemVo.setQuantity(commodity_order_item.getQuantity());
+        commodityOrderItemVo.setTotalPrice(commodity_order_item.getTotalPrice());
+        commodityOrderItemVo.setCreateTime(DateTimeUtil.DateTostr(commodity_order_item.getCreateTime()));
+        commodityOrderItemVo.setUpdateTime(DateTimeUtil.DateTostr(commodity_order_item.getUpdateTime()));
+
+        return commodityOrderItemVo;
+    }
+    private void reduceCommodityStock(List<Commodity_order_item> commodityOrderItems){
+        for(Commodity_order_item commodityOrderItem : commodityOrderItems){
+            Commodity commodity = commodityMapper.selectByPrimaryKey(commodityOrderItem.getCommodityId());
+            commodity.setStock(commodity.getStock()-commodityOrderItem.getQuantity());
+            commodityMapper.updateByPrimaryKeySelective(commodity);
+        }
+    }
+
+    private Commodity_order assembleOrder(BigDecimal payment,Integer userId){
+        Commodity_order commodityOrder =new Commodity_order();
+        commodityOrder.setUserId(userId);
+        Long orderNo =this.generateOrderNo();
+        commodityOrder.setOrderNo(orderNo);
+        commodityOrder.setPayment(payment);
+        commodityOrder.setPaymentType(Const.paymentTypeEnum.PAY_ONLINE.getCode());
+        commodityOrder.setStatus(Const.CommodityOrderStatusEnum.NO_PAY.getCode());
+        int rowCount =commodity_orderMapper.insert(commodityOrder);
+        if(rowCount>0){
+            return commodityOrder;
+        }
+        return null;
+    }
+
+    //随机生成订单号
+    private long generateOrderNo(){
+        long currentTime =System.currentTimeMillis();
+        return currentTime+new Random().nextInt(100);
+    }
+    //把多种商品价格加起来算出总价格
+    private BigDecimal getTolPrice(List<Commodity_order_item> orderItems){
+        BigDecimal payment = new BigDecimal("0");
+        for(Commodity_order_item commodityOrderItem : orderItems){
+            payment =BigDecimalUtil.add(payment.doubleValue(),commodityOrderItem.getTotalPrice().doubleValue());
+        }
+        return payment;
+    }
+
+    //通过购物车信息获取除订单号外其他所有信息
+    private ServerResponse getOrderItem(List<Cart> cartList,Integer userId){
+        List<Commodity_order_item> orderItemList = Lists.newArrayList();
+        if(CollectionUtils.isEmpty(cartList)){
+            return ServerResponse.createByErrorMsg("购物车为空");
+        }
+        for(Cart cart : cartList){
+            Commodity_order_item commodity_order_item =new Commodity_order_item();
+            Commodity commodity =commodityMapper.selectByPrimaryKey(cart.getCommodityId());
+            if(commodity.getStatus()!=Const.CommodityStatusEnum.ON_SALE.getCode()){
+                return ServerResponse.createByErrorMsg("产品"+commodity.getName()+"不是在线售卖状态");
+            }
+            if(commodity.getStock()<cart.getQuantity()){
+                return ServerResponse.createByErrorMsg("产品"+commodity.getName()+"库存不足");
+            }
+            commodity_order_item.setCommodityId(commodity.getId());
+            commodity_order_item.setUserId(userId);
+            commodity_order_item.setQuantity(cart.getQuantity());
+            commodity_order_item.setCommodityName(commodity.getName());
+            commodity_order_item.setCommodityImage(commodity.getMainImage());
+            commodity_order_item.setCurrentUnitPrice(commodity.getPrice());
+            commodity_order_item.setTotalPrice(BigDecimalUtil.mul(cart.getQuantity(),commodity.getPrice().doubleValue()));
+            orderItemList.add(commodity_order_item);
+        }
+        return ServerResponse.createBySuccess(orderItemList);
+    }
+
+
+
+    public ServerResponse<String> cancle(Integer userId,Long orderNo){
+        Commodity_order commodityOrder =commodity_orderMapper.selectByUserIdAndOrderNo(userId,orderNo);
+
+        if(commodityOrder==null){
+            return ServerResponse.createByErrorMsg("用户无该订单");
+        }
+        if(commodityOrder.getStatus() !=Const.CommodityOrderStatusEnum.NO_PAY.getCode()){
+            return ServerResponse.createByErrorMsg("已付款，无法取消订单");
+        }
+        Commodity_order commodityOrderItem =new Commodity_order();
+        commodityOrderItem.setId(commodityOrder.getId());
+        commodityOrderItem.setStatus(Const.CommodityOrderStatusEnum.CANCELED.getCode());
+        int row = commodity_orderMapper.updateByPrimaryKeySelective(commodityOrderItem);
+        if(row>0){
+            return ServerResponse.createBySuccess();
+        }
+        return ServerResponse.createByError();
+    }
+
+    public ServerResponse<CommodityOrderVo> getCommodityOrderDetail(Integer userId,Long orderNo){
+        Commodity_order commodityOrder =commodity_orderMapper.selectByUserIdAndOrderNo(userId,orderNo);
+        if(commodityOrder !=null){
+            List<Commodity_order_item> commodityOrderItems =commodity_order_itemMapper.getByOrderNoUserId(userId,orderNo);
+            CommodityOrderVo commodityOrderVo =this.assembleOrderVo(commodityOrder,commodityOrderItems);
+            return ServerResponse.createBySuccess(commodityOrderVo);
+        }
+        return ServerResponse.createByError();
+    }
+
+    public ServerResponse<PageInfo> getCommodityOrderList(Integer userId, int pageNum, int pageSize){
+        PageHelper.startPage(pageNum,pageSize);
+        List<Commodity_order> commodityOrderList = commodity_orderMapper.selectByUserId(userId);
+        List<CommodityOrderVo> commodityOrderVoList=getList(userId,commodityOrderList);
+        PageInfo pageInfo =new PageInfo(commodityOrderList);
+        pageInfo.setList(commodityOrderVoList);
+        return ServerResponse.createBySuccess(pageInfo);
+    }
+
+    private List<CommodityOrderVo> getList(Integer userId,List<Commodity_order>commodityOrderList){
+        List<CommodityOrderVo> commodityOrderVoList =Lists.newArrayList();
+        for(Commodity_order commodityOrder : commodityOrderList){
+            List<Commodity_order_item> commodityOrderItems =Lists.newArrayList();
+            if(userId == null){
+                commodityOrderItems =commodity_order_itemMapper.getByOrderNo(commodityOrder.getOrderNo());
+            }
+            else{
+                commodityOrderItems =commodity_order_itemMapper.getByOrderNoUserId(userId,commodityOrder.getOrderNo());
+            }
+            CommodityOrderVo commodityOrderVo =assembleOrderVo(commodityOrder,commodityOrderItems);
+            commodityOrderVoList.add(commodityOrderVo);
+        }
+        return  commodityOrderVoList;
+    }
+
+
+    //后台
+    public ServerResponse<PageInfo> getCommodityOrderListManage( int pageNum, int pageSize){
+        PageHelper.startPage(pageNum,pageSize);
+        List<Commodity_order> commodityOrderList = commodity_orderMapper.selectList();
+        List<CommodityOrderVo> commodityOrderVoList=getList(null,commodityOrderList);
+        PageInfo pageInfo =new PageInfo(commodityOrderList);
+        pageInfo.setList(commodityOrderVoList);
+        return ServerResponse.createBySuccess(pageInfo);
+    }
+
+
+    public ServerResponse<CommodityOrderVo> getCommodityOrderDetailManage(Long orderNo){
+        Commodity_order commodityOrder =commodity_orderMapper.selectByOrderNo(orderNo);
+        if(commodityOrder !=null){
+            List<Commodity_order_item> commodityOrderItems =commodity_order_itemMapper.getByOrderNo(orderNo);
+            CommodityOrderVo commodityOrderVo =this.assembleOrderVo(commodityOrder,commodityOrderItems);
+            return ServerResponse.createBySuccess(commodityOrderVo);
+        }
+        return ServerResponse.createByError();
+    }
+
+
+    public ServerResponse<PageInfo> searchOrder(Long orderNo,int pageNum,int pageSize){
+        PageHelper.startPage(pageNum,pageSize);
+        Commodity_order order =commodity_orderMapper.selectByOrderNo(orderNo);
+        if(order==null){
+            return ServerResponse.createByErrorMsg("订单不存在");
+        }
+        List<Commodity_order_item> orderItemList = commodity_order_itemMapper.getByOrderNo(orderNo);
+        CommodityOrderVo orderVo = assembleOrderVo(order,orderItemList);
+
+        PageInfo pageInfo = new PageInfo(Lists.newArrayList(order));
+        pageInfo.setList(Lists.newArrayList(orderVo));
+        return ServerResponse.createBySuccess(pageInfo);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     public ServerResponse pay(Long orderNo, Integer userId , String path){
 
@@ -204,7 +468,7 @@ public class ICommodityOrderServiceImpl implements ICommodityOrderService{
         }
         PayInfo payInfo=new PayInfo();
         payInfo.setUserId(order.getUserId());
-        payInfo.setOrderNo(orderNo);
+        payInfo.setCommodityorderNo(orderNo);
         payInfo.setPlatformNumber(tradeNo);
         payInfo.setPlatformStatus(tradeStatus);
         payInfo.setPayPlatform(Const.payPlatformEnum.ALIPAY.getCode());

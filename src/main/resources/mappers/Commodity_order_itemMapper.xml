@@ -178,4 +178,17 @@
     FROM order_item
     WHERE order_no =#{orderNo}
   </select>
+
+  <insert id="batchInsert" parameterType="list">
+    insert into commodity_order_item (id, user_id, order_no,
+    commodity_id, commodity_name, commodity_image,
+    current_unit_price, quantity, total_price,
+    create_time, update_time)
+    values
+    <foreach collection="commodityOrderItems" index="index" item="item" separator=",">
+      (
+      #{item.id},#{item.userId},#{item.orderNo},#{item.commodityId},#{item.commodityName},#{item.commodityImage},#{item.currentUnitPrice},#{item.quantity},#{item.totalPrice},now(),now()
+      )
+    </foreach>
+  </insert>
 </mapper>
