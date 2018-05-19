@@ -214,7 +214,7 @@
     <include refid="Base_Column_List" />
     FROM `order`
     WHERE user_id=#{userId}
-    order by creat_time desc
+    order by create_time desc
   </select>
 
   <select id="selectList" parameterType="list" resultMap="BaseResultMap">
