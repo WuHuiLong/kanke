@@ -165,10 +165,10 @@
     FROM commodity
     <where>
       <if test="commodityName !=null">
-        AND name LIKE {commodityName}
+        AND name LIKE #{commodityName}
       </if>
       <if test="commodityId !=null">
-        AND id LIKE {commodityId}
+        AND id LIKE #{commodityId}
       </if>
     </where>
   </select>
@@ -179,7 +179,7 @@
     FROM commodity
     <where>
       <if test="commodityName !=null">
-        AND name LIKE  {commodityName}
+        AND name LIKE  #{commodityName}
       </if>
     </where>
   </select>
@@ -188,6 +188,6 @@
     SELECT
     <include refid="Base_Column_List" />
     FROM commodity
-    WHERE status=1;
+    WHERE status=1
   </select>
 </mapper>

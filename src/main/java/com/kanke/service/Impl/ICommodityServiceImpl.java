@@ -80,7 +80,7 @@ public class ICommodityServiceImpl implements ICommodityService{
         CommodityDetailVo commodityDetailVo =new CommodityDetailVo();
         commodityDetailVo.setId(commodity.getId());
         commodityDetailVo.setDetail(commodity.getDetail());
-        commodityDetailVo.setMainImage(commodity.getSubImages());
+        commodityDetailVo.setMainImage(commodity.getMainImage());
         commodityDetailVo.setSubImages(commodity.getSubImages());
         commodityDetailVo.setName(commodity.getName());
         commodityDetailVo.setPrice(commodity.getPrice());

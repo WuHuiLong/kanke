@@ -7,6 +7,8 @@ import com.kanke.pojo.Hall;
 public interface IHallService {
     ServerResponse addHall(Hall hall);
 
+    ServerResponse findAllKind();
+
     ServerResponse updateHall(Hall hall);
 
     ServerResponse<String> deleteHall(Integer hallId);

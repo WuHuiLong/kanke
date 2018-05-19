@@ -131,4 +131,21 @@
     WHERE hall_id=#{hallId}
     and status = 1
   </select>
+
+  <insert id="seatBatchInsert" parameterType="com.kanke.pojo.Seat">
+    insert into seat (id, hall_id, `column`,
+    row, status, create_time,
+    update_time)
+    values
+    <foreach collection="seatList" index="index" item="item" separator=",">
+      (
+      #{item.id},#{item.hallId},#{item.column},#{item.row},#{item.status},now(),now()
+      )
+    </foreach>
+  </insert>
+
+  <delete id="deleteByHallId" parameterType="int">
+    DELETE FROM seat
+    WHERE hall_id=#{hallId}
+  </delete>
 </mapper>

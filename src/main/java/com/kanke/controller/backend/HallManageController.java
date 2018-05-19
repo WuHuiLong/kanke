@@ -46,6 +46,23 @@ public class HallManageController {
     }
 
     /**
+     * 查找所有stype
+     * @param session
+     * @return
+     */
+    @RequestMapping(value="findStype.do",method = RequestMethod.POST)
+    @ResponseBody
+    public ServerResponse findStype(HttpSession session){
+        User user=(User) session.getAttribute(Const.CURRENT_USER);
+        if(user==null){
+            return ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),"用户未登录，请登录");
+        }
+        if(iUserService.checkAdminRole(user).isSuccess()){
+            return iHallService.findAllKind();
+        }
+        return ServerResponse.createByErrorMsg("不是管理员登录,无权限操作");
+    }
+    /**
      * 更新放映厅
      * @param session
      * @param hall

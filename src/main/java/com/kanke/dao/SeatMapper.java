@@ -20,4 +20,8 @@ public interface SeatMapper {
     List<Seat> selectList(Integer hallId);
 
     List<Seat> selectSpecial(Integer hallId);
+
+    void seatBatchInsert(List<Seat> seatList);
+
+    int deleteByHallId(Integer hallId);
 }

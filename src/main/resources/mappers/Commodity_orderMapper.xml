@@ -181,14 +181,14 @@
   
   <select id="selectByUserId" parameterType="int" resultMap="BaseResultMap">
     SELECT
-    <include refid="Base_Column_List"/>
+    <include refid="Base_Column_List" />
     FROM commodity_order
     WHERE user_id=#{userId}
   </select>
 
   <select id="selectList" resultMap="BaseResultMap">
     SELECT
-    <include refid="Base_Column_List"/>
+    <include refid="Base_Column_List" />
     FROM commodity_order
     ORDER BY  create_time desc
   </select>
