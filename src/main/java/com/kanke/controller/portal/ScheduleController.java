@@ -45,10 +45,10 @@ public class ScheduleController {
     @RequestMapping(value="getAllSchedule.do",method = RequestMethod.POST)
     @ResponseBody
     public ServerResponse getAllSchedule(HttpSession session, Integer scheduleId){
-        User user=(User) session.getAttribute(Const.CURRENT_USER);
-        if(user==null){
-            return  ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
-        }
+//        User user=(User) session.getAttribute(Const.CURRENT_USER);
+//        if(user==null){
+//            return  ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
+//        }
         return iScheduleService.getdetailById(scheduleId);
     }
 }
