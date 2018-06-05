@@ -39,18 +39,18 @@ public class IHallServiceImpl implements IHallService {
         }
         int rowCount=hallMapper.insert(hall);
         if(rowCount>0){
+            for(Kind kinditem : kindList){
+                Seat seat = new Seat();
+                seat.setColumn(kinditem.getColumn());
+                seat.setRow(kinditem.getRow());
+                seat.setStatus(Const.SeatStatusEnum.SELECTABLE.getCode());
+                seat.setHallId(hall.getId());
+                seatList.add(seat);
+            }
+            //批量插入座位
+            seatMapper.seatBatchInsert(seatList);
             return ServerResponse.createBySuccess("添加影厅成功");
         }
-        for(Kind kinditem : kindList){
-            Seat seat = new Seat();
-            seat.setColumn(kinditem.getColumn());
-            seat.setRow(kinditem.getRow());
-            seat.setStatus(Const.SeatStatusEnum.SELECTABLE.getCode());
-            seat.setHallId(hall.getId());
-            seatList.add(seat);
-        }
-        //批量插入座位
-        seatMapper.seatBatchInsert(seatList);
         return ServerResponse.createByErrorMsg("添加影厅失败");
     }
 

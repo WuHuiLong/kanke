@@ -12,6 +12,8 @@ import com.kanke.commom.ServerResponse;
 import com.kanke.pojo.*;
 import com.kanke.service.IOrderService;
 import com.kanke.vo.OrderVo;
+import org.codehaus.jackson.map.ObjectMapper;
+import org.codehaus.jackson.type.JavaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -60,12 +63,20 @@ public class OrderController {
      */
     @RequestMapping(value="create.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse create(HttpSession session, Integer scheduleId,List<Seat> seatList){
+    public ServerResponse create(HttpSession session, Integer scheduleId,String seatList){
         User user =(User)session.getAttribute(Const.CURRENT_USER);
         if(user==null){
             return ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
         }
-        return  iOrderService.creat(scheduleId,seatList,user.getId());
+        ObjectMapper objectMapper =new ObjectMapper();
+        JavaType javaType =objectMapper.getTypeFactory().constructParametricType(List.class,Seat.class);
+        try {
+            List<Seat> list =objectMapper.readValue(seatList,javaType);
+            return  iOrderService.creat(scheduleId,list,user.getId());
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**

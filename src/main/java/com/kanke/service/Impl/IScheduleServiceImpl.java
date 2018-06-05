@@ -112,6 +112,7 @@ public class IScheduleServiceImpl implements IScheduleService {
             if(movie==null){
                 return ServerResponse.createByErrorMsg("参数错误");
             }
+            schedule.setPrice(movie.getPrice());
             schedule.setEndTime(DateTimeUtil.strToDate(DateTimeUtil.dateToint(schedule.getStartTime(),Const.HALFTIME,movie.getLength())));
             ServerResponse serverResponse=this.checkConflict(schedule.getStartTime(),schedule.getEndTime());
             if(!serverResponse.isSuccess()){

@@ -154,8 +154,8 @@ public class ICommodityServiceImpl implements ICommodityService{
     }
 
     public ServerResponse<PageInfo> searchList(String keyword,int pageNum,int pageSize){
-        if(StringUtils.isBlank(keyword)){
-            return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
+        if(StringUtils.isNotBlank(keyword)){
+            keyword=new StringBuilder().append("%").append(keyword).append("%").toString();
         }
         PageHelper.startPage(pageNum,pageSize);
         List<Commodity> commodities=commodityMapper.searchCommodityByKeyword(keyword);

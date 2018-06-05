@@ -352,7 +352,12 @@ public class IOrderServiceImpl implements IOrderService {
         Order order =orderMapper.selectByUserIdAndOrderId(userId,orderNo);
         if(order !=null){
             List<OrderItem> orderItemList = orderItemMapper.getByOrderNoUserId(orderNo,userId);
-            List<Seat> seatList =orderItemMapper.selectSeatList(orderNo);
+            List<OrderItem> seatId =orderItemMapper.selectSeatList(orderNo);
+            List<Seat> seatList=Lists.newArrayList();
+            for(OrderItem orderItem : seatId){
+                Seat seat=seatMapper.selectByPrimaryKey(orderItem.getSeatId());
+                seatList.add(seat);
+            }
             OrderVo orderVo =assembleOrderVo(order,orderItemList,seatList);
             return ServerResponse.createBySuccess(orderVo);
         }
@@ -378,7 +383,12 @@ public class IOrderServiceImpl implements IOrderService {
             else{
                 orderItemList =orderItemMapper.getByOrderNoUserId(order.getOrderNo(),userId);
             }
-            List<Seat> seatList = orderItemMapper.selectSeatList(order.getOrderNo());
+            List<OrderItem> seatId =orderItemMapper.selectSeatList(order.getOrderNo());
+            List<Seat> seatList=Lists.newArrayList();
+            for(OrderItem orderItem : seatId){
+                Seat seat=seatMapper.selectByPrimaryKey(orderItem.getSeatId());
+                seatList.add(seat);
+            }
             OrderVo orderVo =assembleOrderVo(order,orderItemList,seatList);
             orderVoList.add(orderVo);
         }
@@ -399,7 +409,12 @@ public class IOrderServiceImpl implements IOrderService {
         Order order =orderMapper.selectByOrderNo(orderNo);
         if(order !=null){
             List<OrderItem> orderItemList = orderItemMapper.getByOrderNo(orderNo);
-            List<Seat> seatList =orderItemMapper.selectSeatList(orderNo);
+            List<OrderItem> seatId =orderItemMapper.selectSeatList(orderNo);
+            List<Seat> seatList=Lists.newArrayList();
+            for(OrderItem orderItem : seatId){
+                Seat seat=seatMapper.selectByPrimaryKey(orderItem.getSeatId());
+                seatList.add(seat);
+            }
             OrderVo orderVo =assembleOrderVo(order,orderItemList,seatList);
             return ServerResponse.createBySuccess(orderVo);
         }
@@ -413,7 +428,12 @@ public class IOrderServiceImpl implements IOrderService {
             return ServerResponse.createByErrorMsg("订单不存在");
         }
         List<OrderItem> orderItemList = orderItemMapper.getByOrderNo(orderNo);
-        List<Seat> seatList =orderItemMapper.selectSeatList(orderNo);
+        List<OrderItem> seatId =orderItemMapper.selectSeatList(orderNo);
+        List<Seat> seatList=Lists.newArrayList();
+        for(OrderItem orderItem : seatId){
+            Seat seat=seatMapper.selectByPrimaryKey(orderItem.getSeatId());
+            seatList.add(seat);
+        }
         OrderVo orderVo = assembleOrderVo(order,orderItemList,seatList);
 
         PageInfo pageInfo = new PageInfo(Lists.newArrayList(order));
