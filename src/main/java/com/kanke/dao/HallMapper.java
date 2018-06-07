@@ -18,4 +18,6 @@ public interface HallMapper {
     int updateByPrimaryKey(Hall record);
 
     List<Hall> selectHallList();
+
+    Hall selectByStype(String stype);
 }

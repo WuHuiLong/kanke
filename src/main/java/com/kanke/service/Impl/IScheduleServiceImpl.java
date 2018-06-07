@@ -121,6 +121,7 @@ public class IScheduleServiceImpl implements IScheduleService {
             int rowCount=scheduleMapper.insert(schedule);
             ScheduleVo scheduleVo=getScheduleVo(schedule);
             if(rowCount>0){
+
                 return ServerResponse.createBySuccess("添加排片成功",scheduleVo);
             }
             return ServerResponse.createByErrorMsg("添加排片失败");

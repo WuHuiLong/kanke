@@ -106,6 +106,7 @@ public class ScheduleManageController {
         if(iUserService.checkAdminRole(user).isSuccess()){
             return  iScheduleService.addAndUpdateSchedule(schedule);
         }
+
         return ServerResponse.createByErrorMsg("不是管理员登录，无权限操作");
     }
 

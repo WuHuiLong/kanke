@@ -12,6 +12,8 @@ import com.kanke.pojo.Hall;
 import com.kanke.pojo.Kind;
 import com.kanke.pojo.Seat;
 import com.kanke.service.IHallService;
+import com.kanke.util.DateTimeUtil;
+import com.kanke.vo.HallVo;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,6 +60,34 @@ public class IHallServiceImpl implements IHallService {
     public ServerResponse findAllKind(){
         List<Kind> kindList =kindMapper.selectList();
         return ServerResponse.createBySuccess(kindList);
+    }
+
+    public ServerResponse<HallVo> getHallByStype(String stype){
+        if(stype==null){
+            return ServerResponse.createByErrorMsg("放映厅暂未安排座位，请换一个试试吧");
+        }
+        Hall hall =hallMapper.selectByStype(stype);
+        if(hall==null){
+            return ServerResponse.createByErrorMsg("这是一个新的类型，快去安排座位吧");
+        }
+        HallVo hallVo = assmHallvo(hall);
+        return ServerResponse.createBySuccess(hallVo);
+    }
+
+    private HallVo assmHallvo(Hall hall){
+        HallVo hallVo =new HallVo();
+        hallVo.setId(hall.getId());
+        hallVo.setName(hall.getName());
+        hallVo.setNumber(hall.getNumber());
+        hallVo.setStatus(hall.getStatus());
+        hallVo.setStype(hall.getStype());
+        hallVo.setCreateTime(DateTimeUtil.DateTostr(hall.getCreateTime()));
+        hallVo.setUpdateTime(DateTimeUtil.DateTostr(hall.getUpdateTime()));
+
+        List<Kind> kindList = kindMapper.selectByStype(hall.getStype());
+        hallVo.setKindList(kindList);
+
+        return hallVo;
     }
     public ServerResponse updateHall(Hall hall){
         if(hall==null){

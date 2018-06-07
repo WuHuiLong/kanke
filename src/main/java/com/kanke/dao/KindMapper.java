@@ -20,4 +20,6 @@ public interface KindMapper {
     List<Kind> selectByStype(String stype);
 
     List<Kind> selectList();
+
+    Kind selectColumnAndRow(String stype);
 }

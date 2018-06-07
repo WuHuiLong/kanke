@@ -140,4 +140,11 @@
     <include refid="Base_Column_List"/>
     FROM kind
   </select>
+  
+  <select id="selectColumnAndRow" resultMap="BaseResultMap" parameterType="string">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM kind
+    WHERE stype=#{stype}
+  </select>
 </mapper>

@@ -9,6 +9,7 @@ import com.kanke.pojo.Hall;
 import com.kanke.pojo.User;
 import com.kanke.service.IHallService;
 import com.kanke.service.IUserService;
+import com.kanke.vo.HallVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -139,7 +140,13 @@ public class HallManageController {
         return ServerResponse.createByErrorMsg("不是管理员登录,无权限操作");
     }
 
-
+    /**
+     * 查看放映厅详情
+     * @param session
+     * @param pageNum
+     * @param pageSize
+     * @return
+     */
     @RequestMapping(value="selectHallDetail.do",method = RequestMethod.POST)
     @ResponseBody
     public  ServerResponse<PageInfo> selectHallDetail(HttpSession session, @RequestParam(value = "pageNum",defaultValue = "1") int pageNum, @RequestParam(value = "pageSize",defaultValue = "10")int pageSize){
@@ -149,6 +156,25 @@ public class HallManageController {
         }
         if(iUserService.checkAdminRole(user).isSuccess()){
             return iHallService.hallList(pageNum,pageSize);
+        }
+        return ServerResponse.createByErrorMsg("不是管理员登录,无权限操作");
+    }
+
+    /**
+     * 查询某个放映厅的座位排列（主要用来显示某个具体放映厅座位的排列顺序）
+     * @param session
+     * @param stype
+     * @return
+     */
+    @RequestMapping(value="getHallByStype.do",method = RequestMethod.POST)
+    @ResponseBody
+    public  ServerResponse<HallVo> getHallByStype(HttpSession session, String stype){
+        User user=(User) session.getAttribute(Const.CURRENT_USER);
+        if(user==null){
+            return ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),"用户未登录，请登录");
+        }
+        if(iUserService.checkAdminRole(user).isSuccess()){
+            return iHallService.getHallByStype(stype);
         }
         return ServerResponse.createByErrorMsg("不是管理员登录,无权限操作");
     }

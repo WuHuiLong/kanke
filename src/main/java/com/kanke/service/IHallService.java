@@ -3,6 +3,7 @@ package com.kanke.service;
 import com.github.pagehelper.PageInfo;
 import com.kanke.commom.ServerResponse;
 import com.kanke.pojo.Hall;
+import com.kanke.vo.HallVo;
 
 public interface IHallService {
     ServerResponse addHall(Hall hall);
@@ -19,4 +20,5 @@ public interface IHallService {
 
     ServerResponse<PageInfo> hallList(int pageNum, int pageSize);
 
+    ServerResponse<HallVo> getHallByStype(String stype);
 }
