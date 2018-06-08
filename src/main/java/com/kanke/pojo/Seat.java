@@ -16,6 +16,8 @@ public class Seat {
 
     private Integer hallId;
 
+    private Integer scheduleId;
+
     private Integer column;
 
     private Integer row;

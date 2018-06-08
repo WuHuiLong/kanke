@@ -79,13 +79,13 @@ public class ScheduleManageController {
      */
     @RequestMapping(value="checkConflict.do",method = RequestMethod.POST)
     @ResponseBody
-    public ServerResponse checkConflict(HttpSession session,Date startTime, Date endTime){
+    public ServerResponse checkConflict(HttpSession session,Integer hallId,Date startTime, Date endTime){
         User user=(User) session.getAttribute(Const.CURRENT_USER);
         if(user==null){
             return  ServerResponse.createByError(ResponseCode.NEED_LOGIN.getCode(),ResponseCode.NEED_LOGIN.getDesc());
         }
         if(iUserService.checkAdminRole(user).isSuccess()){
-            return  iScheduleService.checkConflict(startTime,endTime) ;
+            return  iScheduleService.checkConflict(hallId,startTime,endTime) ;
         }
         return ServerResponse.createByErrorMsg("不是管理员登录，无权限操作");
     }

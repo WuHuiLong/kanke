@@ -1,32 +1,32 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="com.kanke.dao.KindMapper" >
-  <resultMap id="BaseResultMap" type="com.kanke.pojo.Kind" >
-    <constructor >
-      <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
-      <arg column="stype" jdbcType="VARCHAR" javaType="java.lang.String" />
-      <arg column="status" jdbcType="INTEGER" javaType="java.lang.Integer" />
-      <arg column="seat_id" jdbcType="INTEGER" javaType="java.lang.Integer" />
-      <arg column="column" jdbcType="INTEGER" javaType="java.lang.Integer" />
-      <arg column="row" jdbcType="INTEGER" javaType="java.lang.Integer" />
-      <arg column="create_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
-      <arg column="update_time" jdbcType="TIMESTAMP" javaType="java.util.Date" />
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.kanke.dao.KindMapper">
+  <resultMap id="BaseResultMap" type="com.kanke.pojo.Kind">
+    <constructor>
+      <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="stype" javaType="java.lang.String" jdbcType="VARCHAR" />
+      <arg column="status" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="seat_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="column" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="row" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="create_time" javaType="java.util.Date" jdbcType="TIMESTAMP" />
+      <arg column="update_time" javaType="java.util.Date" jdbcType="TIMESTAMP" />
     </constructor>
   </resultMap>
-  <sql id="Base_Column_List" >
+  <sql id="Base_Column_List">
     id, stype, status, seat_id, `column`, row, create_time, update_time
   </sql>
-  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
     from kind
     where id = #{id,jdbcType=INTEGER}
   </select>
-  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from kind
     where id = #{id,jdbcType=INTEGER}
   </delete>
-  <insert id="insert" parameterType="com.kanke.pojo.Kind" >
+  <insert id="insert" parameterType="com.kanke.pojo.Kind">
     insert into kind (id, stype, status, 
       seat_id, `column`, row,
       create_time, update_time)
@@ -34,89 +34,89 @@
       #{seatId,jdbcType=INTEGER}, #{column,jdbcType=INTEGER}, #{row,jdbcType=INTEGER}, 
       now(), now())
   </insert>
-  <insert id="insertSelective" parameterType="com.kanke.pojo.Kind" >
+  <insert id="insertSelective" parameterType="com.kanke.pojo.Kind">
     insert into kind
-    <trim prefix="(" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         id,
       </if>
-      <if test="stype != null" >
+      <if test="stype != null">
         stype,
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         status,
       </if>
-      <if test="seatId != null" >
+      <if test="seatId != null">
         seat_id,
       </if>
-      <if test="column != null" >
+      <if test="column != null">
         `column`,
       </if>
-      <if test="row != null" >
+      <if test="row != null">
         row,
       </if>
-      <if test="createTime != null" >
+      <if test="createTime != null">
         create_time,
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         update_time,
       </if>
     </trim>
-    <trim prefix="values (" suffix=")" suffixOverrides="," >
-      <if test="id != null" >
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
         #{id,jdbcType=INTEGER},
       </if>
-      <if test="stype != null" >
+      <if test="stype != null">
         #{stype,jdbcType=VARCHAR},
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         #{status,jdbcType=INTEGER},
       </if>
-      <if test="seatId != null" >
+      <if test="seatId != null">
         #{seatId,jdbcType=INTEGER},
       </if>
-      <if test="column != null" >
+      <if test="column != null">
         #{column,jdbcType=INTEGER},
       </if>
-      <if test="row != null" >
+      <if test="row != null">
         #{row,jdbcType=INTEGER},
       </if>
-      <if test="createTime != null" >
+      <if test="createTime != null">
         now(),
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         now(),
       </if>
     </trim>
   </insert>
-  <update id="updateByPrimaryKeySelective" parameterType="com.kanke.pojo.Kind" >
+  <update id="updateByPrimaryKeySelective" parameterType="com.kanke.pojo.Kind">
     update kind
-    <set >
-      <if test="stype != null" >
+    <set>
+      <if test="stype != null">
         stype = #{stype,jdbcType=VARCHAR},
       </if>
-      <if test="status != null" >
+      <if test="status != null">
         status = #{status,jdbcType=INTEGER},
       </if>
-      <if test="seatId != null" >
+      <if test="seatId != null">
         seat_id = #{seatId,jdbcType=INTEGER},
       </if>
-      <if test="column != null" >
+      <if test="column != null">
         `column` = #{column,jdbcType=INTEGER},
       </if>
-      <if test="row != null" >
+      <if test="row != null">
         row = #{row,jdbcType=INTEGER},
       </if>
-      <if test="createTime != null" >
+      <if test="createTime != null">
         create_time = #{createTime,jdbcType=TIMESTAMP},
       </if>
-      <if test="updateTime != null" >
+      <if test="updateTime != null">
         update_time = now(),
       </if>
     </set>
     where id = #{id,jdbcType=INTEGER}
   </update>
-  <update id="updateByPrimaryKey" parameterType="com.kanke.pojo.Kind" >
+  <update id="updateByPrimaryKey" parameterType="com.kanke.pojo.Kind">
     update kind
     set stype = #{stype,jdbcType=VARCHAR},
       status = #{status,jdbcType=INTEGER},
@@ -128,22 +128,22 @@
     where id = #{id,jdbcType=INTEGER}
   </update>
 
-  <select id="selectByStype" resultType="string" resultMap="BaseResultMap">
+  <select id="selectByStype" resultMap="BaseResultMap" resultType="string">
     SELECT
-    <include refid="Base_Column_List"/>
+    <include refid="Base_Column_List" />
     FROM kind
     WHERE stype =#{stype}
   </select>
   
   <select id="selectList" resultMap="BaseResultMap">
     SELECT
-    <include refid="Base_Column_List"/>
+    <include refid="Base_Column_List" />
     FROM kind
   </select>
   
-  <select id="selectColumnAndRow" resultMap="BaseResultMap" parameterType="string">
+  <select id="selectColumnAndRow" parameterType="string" resultMap="BaseResultMap">
     SELECT
-    <include refid="Base_Column_List"/>
+    <include refid="Base_Column_List" />
     FROM kind
     WHERE stype=#{stype}
   </select>

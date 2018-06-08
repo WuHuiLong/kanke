@@ -5,6 +5,7 @@
     <constructor>
       <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
       <arg column="hall_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="schedule_id" javaType="java.lang.Integer" jdbcType="INTEGER" />
       <arg column="column" javaType="java.lang.Integer" jdbcType="INTEGER" />
       <arg column="row" javaType="java.lang.Integer" jdbcType="INTEGER" />
       <arg column="status" javaType="java.lang.Integer" jdbcType="INTEGER" />
@@ -13,7 +14,7 @@
     </constructor>
   </resultMap>
   <sql id="Base_Column_List">
-    id, hall_id, `column`, row, status, create_time, update_time
+    id, hall_id, schedule_id, column, row, status, create_time, update_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -26,12 +27,12 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.kanke.pojo.Seat">
-    insert into seat (id, hall_id, column, 
-      row, status, create_time, 
-      update_time)
-    values (#{id,jdbcType=INTEGER}, #{hallId,jdbcType=INTEGER}, #{column,jdbcType=INTEGER}, 
-      #{row,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, now(),
-      now())
+    insert into seat (id, hall_id, schedule_id, 
+      column, row, status, 
+      create_time, update_time)
+    values (#{id,jdbcType=INTEGER}, #{hallId,jdbcType=INTEGER}, #{scheduleId,jdbcType=INTEGER}, 
+      #{column,jdbcType=INTEGER}, #{row,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
+     now(), now())
   </insert>
   <insert id="insertSelective" parameterType="com.kanke.pojo.Seat">
     insert into seat
@@ -42,8 +43,11 @@
       <if test="hallId != null">
         hall_id,
       </if>
+      <if test="scheduleId != null">
+        schedule_id,
+      </if>
       <if test="column != null">
-        `column`,
+        column,
       </if>
       <if test="row != null">
         row,
@@ -64,6 +68,9 @@
       </if>
       <if test="hallId != null">
         #{hallId,jdbcType=INTEGER},
+      </if>
+      <if test="scheduleId != null">
+        #{scheduleId,jdbcType=INTEGER},
       </if>
       <if test="column != null">
         #{column,jdbcType=INTEGER},
@@ -88,8 +95,11 @@
       <if test="hallId != null">
         hall_id = #{hallId,jdbcType=INTEGER},
       </if>
+      <if test="scheduleId != null">
+        schedule_id = #{scheduleId,jdbcType=INTEGER},
+      </if>
       <if test="column != null">
-        `column` = #{column,jdbcType=INTEGER},
+        column = #{column,jdbcType=INTEGER},
       </if>
       <if test="row != null">
         row = #{row,jdbcType=INTEGER},
@@ -109,6 +119,7 @@
   <update id="updateByPrimaryKey" parameterType="com.kanke.pojo.Seat">
     update seat
     set hall_id = #{hallId,jdbcType=INTEGER},
+      schedule_id = #{scheduleId,jdbcType=INTEGER},
       column = #{column,jdbcType=INTEGER},
       row = #{row,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
@@ -116,6 +127,7 @@
       update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
+
   
   <select id="selectList" resultMap="BaseResultMap">
     SELECT

@@ -6,7 +6,7 @@
       <idArg column="id" javaType="java.lang.Integer" jdbcType="INTEGER" />
       <arg column="username" javaType="java.lang.String" jdbcType="VARCHAR" />
       <arg column="password" javaType="java.lang.String" jdbcType="VARCHAR" />
-      <arg column="telephone" javaType="java.lang.Integer" jdbcType="INTEGER" />
+      <arg column="telephone" javaType="java.lang.String" jdbcType="VARCHAR" />
       <arg column="email" javaType="java.lang.String" jdbcType="VARCHAR" />
       <arg column="name" javaType="java.lang.String" jdbcType="VARCHAR" />
       <arg column="members" javaType="java.lang.Integer" jdbcType="INTEGER" />
@@ -18,11 +18,11 @@
     </constructor>
   </resultMap>
   <sql id="Base_Column_List">
-    id, username, password, telephone, email, name, members, role, question, answer, create_time,
-    update_time
+    id, username, password, telephone, email, name, members, role, question, answer, 
+    create_time, update_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
-    select
+    select 
     <include refid="Base_Column_List" />
     from user
     where id = #{id,jdbcType=INTEGER}
@@ -32,16 +32,16 @@
     where id = #{id,jdbcType=INTEGER}
   </delete>
   <insert id="insert" parameterType="com.kanke.pojo.User">
-    insert into user (id, username, password,
-    telephone, email, name,
-    members, role, question,
-    answer, create_time, update_time
-    )
-    values (#{id,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR},
-    #{telephone,jdbcType=INTEGER}, #{email,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
-    #{members,jdbcType=INTEGER}, #{role,jdbcType=INTEGER}, #{question,jdbcType=VARCHAR},
-    #{answer,jdbcType=VARCHAR}, now(), now()
-    )
+    insert into user (id, username, password, 
+      telephone, email, name, 
+      members, role, question, 
+      answer, create_time, update_time
+      )
+    values (#{id,jdbcType=INTEGER}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
+      #{telephone,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
+      #{members,jdbcType=INTEGER}, #{role,jdbcType=INTEGER}, #{question,jdbcType=VARCHAR}, 
+      #{answer,jdbcType=VARCHAR},now(), now()
+      )
   </insert>
   <insert id="insertSelective" parameterType="com.kanke.pojo.User">
     insert into user
@@ -94,7 +94,7 @@
         #{password,jdbcType=VARCHAR},
       </if>
       <if test="telephone != null">
-        #{telephone,jdbcType=INTEGER},
+        #{telephone,jdbcType=VARCHAR},
       </if>
       <if test="email != null">
         #{email,jdbcType=VARCHAR},
@@ -132,7 +132,7 @@
         password = #{password,jdbcType=VARCHAR},
       </if>
       <if test="telephone != null">
-        telephone = #{telephone,jdbcType=INTEGER},
+        telephone = #{telephone,jdbcType=VARCHAR},
       </if>
       <if test="email != null">
         email = #{email,jdbcType=VARCHAR},
@@ -164,16 +164,16 @@
   <update id="updateByPrimaryKey" parameterType="com.kanke.pojo.User">
     update user
     set username = #{username,jdbcType=VARCHAR},
-    password = #{password,jdbcType=VARCHAR},
-    telephone = #{telephone,jdbcType=INTEGER},
-    email = #{email,jdbcType=VARCHAR},
-    name = #{name,jdbcType=VARCHAR},
-    members = #{members,jdbcType=INTEGER},
-    role = #{role,jdbcType=INTEGER},
-    question = #{question,jdbcType=VARCHAR},
-    answer = #{answer,jdbcType=VARCHAR},
-    create_time = #{createTime,jdbcType=TIMESTAMP},
-    update_time = now()
+      password = #{password,jdbcType=VARCHAR},
+      telephone = #{telephone,jdbcType=VARCHAR},
+      email = #{email,jdbcType=VARCHAR},
+      name = #{name,jdbcType=VARCHAR},
+      members = #{members,jdbcType=INTEGER},
+      role = #{role,jdbcType=INTEGER},
+      question = #{question,jdbcType=VARCHAR},
+      answer = #{answer,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_time = now()
     where id = #{id,jdbcType=INTEGER}
   </update>
 

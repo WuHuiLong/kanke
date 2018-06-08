@@ -13,7 +13,7 @@ public interface IScheduleService {
 
     ServerResponse<ScheduleVo> detail(Integer scheduleId);
 
-    ServerResponse checkConflict(Date startTime, Date endTime);
+    ServerResponse checkConflict(Integer hallId,Date startTime,Date endTime);
 
     ServerResponse<ScheduleVo> addAndUpdateSchedule(Schedule schedule);
 

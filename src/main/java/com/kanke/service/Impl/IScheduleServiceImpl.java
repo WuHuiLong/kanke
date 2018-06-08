@@ -7,11 +7,10 @@ import com.kanke.commom.Const;
 import com.kanke.commom.ResponseCode;
 import com.kanke.commom.ServerResponse;
 import com.kanke.dao.HallMapper;
+import com.kanke.dao.KindMapper;
 import com.kanke.dao.MovieMapper;
 import com.kanke.dao.ScheduleMapper;
-import com.kanke.pojo.Hall;
-import com.kanke.pojo.Movie;
-import com.kanke.pojo.Schedule;
+import com.kanke.pojo.*;
 import com.kanke.service.IScheduleService;
 import com.kanke.util.DateTimeUtil;
 import com.kanke.vo.ScheduleVo;
@@ -31,6 +30,8 @@ public class IScheduleServiceImpl implements IScheduleService {
     private MovieMapper movieMapper;
     @Autowired
     private HallMapper hallMapper;
+    @Autowired
+    private KindMapper kindMapper;
 
 //    public ServerResponse<ScheduleVo> selectSchedule(Integer movieId,Integer hallId){
 //        if(movieId==null&&hallId==null){
@@ -71,11 +72,12 @@ public class IScheduleServiceImpl implements IScheduleService {
         return ServerResponse.createBySuccess(scheduleVo);
     }
 
-    public ServerResponse checkConflict(Date startTime,Date endTime){
+    public ServerResponse checkConflict(Integer hallId,Date startTime,Date endTime){
         if(startTime==null&&endTime==null){
             return ServerResponse.createByErrorMsg("参数错误");
         }
-        int rowCount=scheduleMapper.checkConflict(startTime,endTime);
+
+        int rowCount=scheduleMapper.checkConflict(hallId,startTime,endTime);
         if(rowCount>0){
             return  ServerResponse.createByErrorMsg("时间冲突，请重新排片");
         }
@@ -114,16 +116,17 @@ public class IScheduleServiceImpl implements IScheduleService {
             }
             schedule.setPrice(movie.getPrice());
             schedule.setEndTime(DateTimeUtil.strToDate(DateTimeUtil.dateToint(schedule.getStartTime(),Const.HALFTIME,movie.getLength())));
-            ServerResponse serverResponse=this.checkConflict(schedule.getStartTime(),schedule.getEndTime());
+            ServerResponse serverResponse=this.checkConflict(schedule.getHallId(),schedule.getStartTime(),schedule.getEndTime());
             if(!serverResponse.isSuccess()){
                 return serverResponse;
             }
             int rowCount=scheduleMapper.insert(schedule);
             ScheduleVo scheduleVo=getScheduleVo(schedule);
             if(rowCount>0){
-
+                
                 return ServerResponse.createBySuccess("添加排片成功",scheduleVo);
             }
+
             return ServerResponse.createByErrorMsg("添加排片失败");
 
         }else{
@@ -132,7 +135,7 @@ public class IScheduleServiceImpl implements IScheduleService {
                 return ServerResponse.createByErrorMsg("参数错误");
             }
             schedule.setEndTime(DateTimeUtil.strToDate(DateTimeUtil.dateToint(schedule.getStartTime(),Const.HALFTIME,movie.getLength())));
-            ServerResponse serverResponse=this.checkConflict(schedule.getStartTime(),schedule.getEndTime());
+            ServerResponse serverResponse=this.checkConflict(schedule.getHallId(),schedule.getStartTime(),schedule.getEndTime());
             if(!serverResponse.isSuccess()){
                 return serverResponse;
             }

@@ -138,10 +138,11 @@
   <select id="checkConflict" parameterType="map" resultType="int">
     SELECT count(1)
     FROM schedule
-    WHERE (start_time BETWEEN #{startTime} and #{endTime})
+    WHERE hall_id=#{hallId}
+    and ((start_time BETWEEN #{startTime} and #{endTime})
     or (end_time between #{startTime} and #{endTime})
     or (#{startTime} between start_time and end_time)
-    or (#{endTime} between start_time and end_time)
+    or (#{endTime} between start_time and end_time))
   </select>
 
   <select id="selectByMovieId" parameterType="int" resultMap="BaseResultMap">

@@ -125,7 +125,7 @@
 
   <select id="selectByStype" parameterType="String" resultMap="BaseResultMap">
     SELECT
-    <include refid="Base_Column_List"/>
+    <include refid="Base_Column_List" />
     FROM hall
     WHERE stype=#{stype}
   </select>
