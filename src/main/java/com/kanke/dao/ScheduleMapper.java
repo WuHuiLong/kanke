@@ -26,4 +26,6 @@ public interface ScheduleMapper {
     List<Schedule> selectByMovieId(Integer movieId);
 
     List<Schedule> selectList();
+
+    int selectScheduleId();
 }

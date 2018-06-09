@@ -6,14 +6,12 @@ import com.google.common.collect.Lists;
 import com.kanke.commom.Const;
 import com.kanke.commom.ResponseCode;
 import com.kanke.commom.ServerResponse;
-import com.kanke.dao.HallMapper;
-import com.kanke.dao.KindMapper;
-import com.kanke.dao.MovieMapper;
-import com.kanke.dao.ScheduleMapper;
+import com.kanke.dao.*;
 import com.kanke.pojo.*;
 import com.kanke.service.IScheduleService;
 import com.kanke.util.DateTimeUtil;
 import com.kanke.vo.ScheduleVo;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +30,8 @@ public class IScheduleServiceImpl implements IScheduleService {
     private HallMapper hallMapper;
     @Autowired
     private KindMapper kindMapper;
+    @Autowired
+    private SeatMapper seatMapper;
 
 //    public ServerResponse<ScheduleVo> selectSchedule(Integer movieId,Integer hallId){
 //        if(movieId==null&&hallId==null){
@@ -109,11 +109,22 @@ public class IScheduleServiceImpl implements IScheduleService {
         if(schedule==null){
             return ServerResponse.createByError(ResponseCode.ILLEGAL_ARGUMENT.getCode(),ResponseCode.ILLEGAL_ARGUMENT.getDesc());
         }
+
         if(schedule.getId()==null){
             Movie movie=movieMapper.selectByPrimaryKey(schedule.getMovieId());
             if(movie==null){
                 return ServerResponse.createByErrorMsg("参数错误");
             }
+            Hall hall = hallMapper.selectByPrimaryKey(schedule.getHallId());
+            if(hall==null){
+                return ServerResponse.createByErrorMsg("请输入放映厅后再试");
+            }
+            List<Kind> kindList = kindMapper.selectByStype(hall.getStype());
+            if(CollectionUtils.isEmpty(kindList)){
+                return ServerResponse.createByErrorMsg("没有这个类型哦");
+            }
+            List<Seat> seatList =Lists.newArrayList();
+
             schedule.setPrice(movie.getPrice());
             schedule.setEndTime(DateTimeUtil.strToDate(DateTimeUtil.dateToint(schedule.getStartTime(),Const.HALFTIME,movie.getLength())));
             ServerResponse serverResponse=this.checkConflict(schedule.getHallId(),schedule.getStartTime(),schedule.getEndTime());
@@ -123,7 +134,16 @@ public class IScheduleServiceImpl implements IScheduleService {
             int rowCount=scheduleMapper.insert(schedule);
             ScheduleVo scheduleVo=getScheduleVo(schedule);
             if(rowCount>0){
-                
+                for(Kind kind : kindList){
+                    Seat seat =new Seat();
+                    seat.setHallId(schedule.getHallId());
+                    seat.setStatus(Const.SeatStatusEnum.SELECTABLE.getCode());
+                    seat.setRow(kind.getRow());
+                    seat.setColumn(kind.getColumn());
+                    seat.setScheduleId(scheduleMapper.selectScheduleId());
+                    seatList.add(seat);
+                }
+                seatMapper.seatBatchInsert(seatList);
                 return ServerResponse.createBySuccess("添加排片成功",scheduleVo);
             }
 
@@ -134,6 +154,16 @@ public class IScheduleServiceImpl implements IScheduleService {
             if(movie==null){
                 return ServerResponse.createByErrorMsg("参数错误");
             }
+            Hall hall = hallMapper.selectByPrimaryKey(schedule.getHallId());
+            if(hall==null){
+                return ServerResponse.createByErrorMsg("请输入放映厅后再试");
+            }
+            List<Kind> kindList = kindMapper.selectByStype(hall.getStype());
+            if(CollectionUtils.isEmpty(kindList)){
+                return ServerResponse.createByErrorMsg("没有这个类型哦");
+            }
+            List<Seat> seatList =Lists.newArrayList();
+            schedule.setPrice(movie.getPrice());
             schedule.setEndTime(DateTimeUtil.strToDate(DateTimeUtil.dateToint(schedule.getStartTime(),Const.HALFTIME,movie.getLength())));
             ServerResponse serverResponse=this.checkConflict(schedule.getHallId(),schedule.getStartTime(),schedule.getEndTime());
             if(!serverResponse.isSuccess()){
@@ -142,6 +172,16 @@ public class IScheduleServiceImpl implements IScheduleService {
             int rowCount=scheduleMapper.updateByPrimaryKey(schedule);
             ScheduleVo scheduleVo=getScheduleVo(schedule);
             if(rowCount>0){
+                for(Kind kind : kindList){
+                    Seat seat =new Seat();
+                    seat.setHallId(schedule.getHallId());
+                    seat.setStatus(Const.SeatStatusEnum.SELECTABLE.getCode());
+                    seat.setRow(kind.getRow());
+                    seat.setColumn(kind.getColumn());
+                    seat.setScheduleId(schedule.getId());
+                    seatList.add(seat);
+                }
+                seatMapper.seatBatchInsert(seatList);
                 return ServerResponse.createBySuccess("修改排片成功",scheduleVo);
             }
             return ServerResponse.createByErrorMsg("修改排片失败");

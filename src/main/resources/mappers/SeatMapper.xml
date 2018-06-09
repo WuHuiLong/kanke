@@ -14,7 +14,7 @@
     </constructor>
   </resultMap>
   <sql id="Base_Column_List">
-    id, hall_id, schedule_id, column, row, status, create_time, update_time
+    id, hall_id, schedule_id, `column`, row, status, create_time, update_time
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
     select 
@@ -28,7 +28,7 @@
   </delete>
   <insert id="insert" parameterType="com.kanke.pojo.Seat">
     insert into seat (id, hall_id, schedule_id, 
-      column, row, status, 
+      `column`, row, status,
       create_time, update_time)
     values (#{id,jdbcType=INTEGER}, #{hallId,jdbcType=INTEGER}, #{scheduleId,jdbcType=INTEGER}, 
       #{column,jdbcType=INTEGER}, #{row,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, 
@@ -47,7 +47,7 @@
         schedule_id,
       </if>
       <if test="column != null">
-        column,
+        `column`,
       </if>
       <if test="row != null">
         row,
@@ -99,7 +99,7 @@
         schedule_id = #{scheduleId,jdbcType=INTEGER},
       </if>
       <if test="column != null">
-        column = #{column,jdbcType=INTEGER},
+        `column` = #{column,jdbcType=INTEGER},
       </if>
       <if test="row != null">
         row = #{row,jdbcType=INTEGER},
@@ -120,7 +120,7 @@
     update seat
     set hall_id = #{hallId,jdbcType=INTEGER},
       schedule_id = #{scheduleId,jdbcType=INTEGER},
-      column = #{column,jdbcType=INTEGER},
+      `column` = #{column,jdbcType=INTEGER},
       row = #{row,jdbcType=INTEGER},
       status = #{status,jdbcType=INTEGER},
       create_time = #{createTime,jdbcType=TIMESTAMP},
@@ -144,14 +144,14 @@
     and status = 1
   </select>
 
-  <insert id="seatBatchInsert" parameterType="com.kanke.pojo.Seat">
-    insert into seat (id, hall_id, `column`,
-    row, status, create_time,
-    update_time)
+  <insert id="seatBatchInsert" parameterType="list">
+    insert into seat (id, hall_id, schedule_id,
+    `column`, row, status,
+    create_time, update_time)
     values
     <foreach collection="seatList" index="index" item="item" separator=",">
       (
-      #{item.id},#{item.hallId},#{item.column},#{item.row},#{item.status},now(),now()
+      #{item.id},#{item.hallId},#{item.scheduleId},#{item.column},#{item.row},#{item.status},now(),now()
       )
     </foreach>
   </insert>

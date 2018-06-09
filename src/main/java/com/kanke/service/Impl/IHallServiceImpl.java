@@ -34,23 +34,8 @@ public class IHallServiceImpl implements IHallService {
         if(hall==null){
             return ServerResponse.createByErrorMsg("参数错误，请重新再试");
         }
-        List<Kind> kindList =kindMapper.selectByStype(hall.getStype());
-        List<Seat> seatList = Lists.newArrayList();
-        if(CollectionUtils.isEmpty(kindList)){
-            return ServerResponse.createByErrorMsg("没有这个类型哦");
-        }
         int rowCount=hallMapper.insert(hall);
         if(rowCount>0){
-            for(Kind kinditem : kindList){
-                Seat seat = new Seat();
-                seat.setColumn(kinditem.getColumn());
-                seat.setRow(kinditem.getRow());
-                seat.setStatus(Const.SeatStatusEnum.SELECTABLE.getCode());
-                seat.setHallId(hall.getId());
-                seatList.add(seat);
-            }
-            //批量插入座位
-            seatMapper.seatBatchInsert(seatList);
             return ServerResponse.createBySuccess("添加影厅成功");
         }
         return ServerResponse.createByErrorMsg("添加影厅失败");

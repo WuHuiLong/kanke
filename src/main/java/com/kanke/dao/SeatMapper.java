@@ -1,6 +1,7 @@
 package com.kanke.dao;
 
 import com.kanke.pojo.Seat;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -21,7 +22,7 @@ public interface SeatMapper {
 
     List<Seat> selectSpecial(Integer hallId);
 
-    void seatBatchInsert(List<Seat> seatList);
+    void seatBatchInsert(@Param("seatList") List<Seat> seatList);
 
     int deleteByHallId(Integer hallId);
 }

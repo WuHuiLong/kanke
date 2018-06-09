@@ -157,5 +157,9 @@
     <include refid="Base_Column_List" />
     FROM schedule
   </select>
-
+  
+  <select id="selectScheduleId" resultType="int">
+    SELECT max(id)
+    FROM schedule
+  </select>
 </mapper>
