@@ -165,6 +165,10 @@ public class IScheduleServiceImpl implements IScheduleService {
             List<Seat> seatList =Lists.newArrayList();
             schedule.setPrice(movie.getPrice());
             schedule.setEndTime(DateTimeUtil.strToDate(DateTimeUtil.dateToint(schedule.getStartTime(),Const.HALFTIME,movie.getLength())));
+            System.out.println(schedule.getStartTime()+"wjhefasfjkcwgsbhjkfgajhsbfjh");
+            System.out.println(DateTimeUtil.DateTostr(schedule.getStartTime())+"wjhefasfjkcwgsbhjkfgajhsbfjh");
+            System.out.println(Const.HALFTIME+"wjhefasfjkcwgsbhjkfgajhsbfjh");
+            System.out.println(movie.getLength()+"wjhefasfjkcwgsbhjkfgajhsbfjh");
             ServerResponse serverResponse=this.checkConflict(schedule.getHallId(),schedule.getStartTime(),schedule.getEndTime());
             if(!serverResponse.isSuccess()){
                 return serverResponse;
@@ -204,7 +208,7 @@ public class IScheduleServiceImpl implements IScheduleService {
 
         Hall hall=hallMapper.selectByPrimaryKey(schedule.getHallId());
         scheduleVo.setHallName(hall.getName());
-        scheduleVo.setEndTime1(DateTimeUtil.dateToint(schedule.getStartTime(),Const.HALFTIME,movie.getLength()));
+        scheduleVo.setEndTime1(DateTimeUtil.DateTostr(schedule.getEndTime()));
 
         return scheduleVo;
     }

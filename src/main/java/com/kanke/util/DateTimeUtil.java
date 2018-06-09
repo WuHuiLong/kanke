@@ -11,7 +11,7 @@ import java.util.logging.SimpleFormatter;
 
 public class DateTimeUtil {
 
-    public static final String STANDARD_TIME="yyyy-MM-dd HH:ss:hh";
+    public static final String STANDARD_TIME="yyyy-MM-dd HH:mm:ss";
     public static Date strToDate(String dateTimeStr,String formatStr){
         DateTimeFormatter dateTimeFormat=DateTimeFormat.forPattern(formatStr);
         DateTime dateTime=dateTimeFormat.parseDateTime(dateTimeStr);
@@ -43,7 +43,7 @@ public class DateTimeUtil {
         }
     }
     public static String dateToint(Date time,Long time1,int movieLength){
-        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:ss:hh");
+        SimpleDateFormat simpleDateFormat=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String s= simpleDateFormat.format(new Date(time.getTime()+time1+movieLength*60*1000L));
         return s;
     }
